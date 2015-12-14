@@ -1,0 +1,18 @@
+<resources>
+
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_url">Datenbank-URL</string>
+    <string name="prompt_user">Benutzername</string>
+    <string name="prompt_password">Passwort</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_sign_in_short">Login</string>
+    <string name="error_invalid_url">Die Url ist ungültig</string>
+    <string name="error_invalid_email">Der Benutzername ist ungültig</string>
+    <string name="error_invalid_password">Das Passwort ist zu kurz</string>
+    <string name="error_incorrect_password">Das Passwort ist falsch</string>
+    <string name="error_wrong_credentials">Die Zugangsdaten sind falsch</string>
+    <string name="error_field_required">Dieses Feld wird benötigt</string>
+
+</resources>

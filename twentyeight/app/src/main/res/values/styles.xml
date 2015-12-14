@@ -1,0 +1,20 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+   <style name="AppTheme" parent="android:Theme.Material">
+
+    <item name="android:actionBarStyle">@style/ActionBar</item>
+    <item name="android:windowActionBar">false</item>
+    <item name="android:windowTitleSize">0dp</item>
+    <item name="android:colorPrimary">@color/blue</item>
+    <item name="android:colorPrimaryDark">@color/darkorange</item>
+    <item name="android:activatedBackgroundIndicator">@drawable/green</item>
+    <item name="android:colorAccent">@color/darkorange</item>
+    <item name="android:navigationBarColor">@android:color/transparent</item>
+    <item name="android:statusBarColor">@android:color/transparent</item>
+
+</style>
+
+
+<style name="ActionBar" parent="android:Widget.ActionBar">
+    <item name="android:background">@color/darkorange</item>
+</style>
+</resources>

@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="de.paulsapp.homeapp.MainActivity" >
+
+     <item
+        android:id="@+id/refresh"
+         android:orderInCategory="80"
+        android:showAsAction="ifRoom"
+        android:title="@string/refresh" android:icon="@drawable/sanduhr">
+    </item>
+    <item
+        android:id="@+id/login_activity"
+        android:orderInCategory="90"
+        android:showAsAction="never"
+        android:title="@string/login_activity"/>
+    
+    <item
+        android:id="@+id/export_db"
+        android:orderInCategory="110"
+        android:showAsAction="never"
+        android:title="@string/export_db"/>
+    <item
+        android:id="@+id/delete_db"
+        android:orderInCategory="120"
+        android:showAsAction="never"
+        android:title="@string/delete_db"/>
+   
+
+</menu>

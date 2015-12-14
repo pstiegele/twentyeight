@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">twentyeight</string>
+    <string name="label_main"></string>
+    <string name="action_settings">Settings</string>
+    <string name="onlinestatus">online status</string>
+    <string name="login_activity">Zugangsdaten</string>
+    <string name="export_db">DB exportieren</string>
+    <string name="delete_db">DB löschen</string>
+    <string name="refresh">Aktualisieren</string>
+
+    <string name="dbname">localdb</string>
+    <string name="dbversion">1</string>
+    
+     <string-array name="create">
+        <item>      create table temperature(
+        id integer primary key autoincrement,
+        value REAL,
+        datetime DATETIME,
+        sensorid int        
+      	)
+</item>
+        <item>      create table savedUsers(
+        id integer primary key autoincrement,
+        url TEXT,
+        user TEXT,
+        password TEXT,
+        datetime DATETIME,
+        selected BIT
+      )
+</item>
+        <item>      create table sync(
+        id integer primary key autoincrement,
+        datetime DATETIME
+      )
+</item>
+    </string-array>
+
+</resources>
