@@ -247,6 +247,7 @@
     <string name="action_sign_in">Login</string>
     <string name="action_sign_in_short">Login</string>
     <string name="app_name">twentyeight</string>
+    <string name="closeDrawer">Close</string>
     <string name="dbname">localdb</string>
     <string name="dbversion">1</string>
     <string name="delete_db">DB löschen</string>
@@ -260,6 +261,7 @@
     <string name="label_main"/>
     <string name="login_activity">Zugangsdaten</string>
     <string name="onlinestatus">online status</string>
+    <string name="openDrawer">Open</string>
     <string name="prompt_password">Passwort</string>
     <string name="prompt_url">Datenbank-URL</string>
     <string name="prompt_user">Benutzername</string>

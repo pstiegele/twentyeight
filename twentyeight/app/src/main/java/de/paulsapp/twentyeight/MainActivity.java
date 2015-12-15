@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -20,6 +21,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +29,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -67,26 +70,48 @@ public class MainActivity extends Activity {
 	private String[] mPlanetTitles;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
+	private ActionBarDrawerToggle mDrawerToggle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.layout_root);
 		context = getApplicationContext();
-		init();
+		init(savedInstanceState);
 
 	}
 
-	public void init() {
+	/* Called whenever we call invalidateOptionsMenu() */
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		// If the nav drawer is open, hide action items related to the content view
+		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+		//menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+		return super.onPrepareOptionsMenu(menu);
+	}
+	public void init(Bundle savedInstanceState) {
 
-		String[] test = {"a","b","c"};
+		String[] test = {"Kühlschrank","Wasserkocher","Bluetooth Speaker","Light Stripe"};
 		mPlanetTitles = test;
 		mDrawerLayout = (DrawerLayout)findViewById(R.id.layout_root);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
 		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
 				R.layout.drawer_list_item, mPlanetTitles));
-		//mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+		mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,R.string.openDrawer,R.string.closeDrawer){
+			public void onDrawerClosed(View view) {
+				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+			}
+
+			public void onDrawerOpened(View drawerView) {
+				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+			}
+		};
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		if (savedInstanceState == null){
+			selectItem(0);
+		}
 
 
 		SharedPreferences settings;
@@ -385,7 +410,7 @@ public class MainActivity extends Activity {
 		});
 		animator.setEvaluator(new TypeEvaluator<Float>() {
 			public Float evaluate(float fraction, Float startValue,
-					Float endValue) {
+								  Float endValue) {
 				return Float.valueOf(String.valueOf(Math
 						.round((startValue - ((startValue - endValue) * fraction)) * 10) / 10.0));
 			}
@@ -402,7 +427,7 @@ public class MainActivity extends Activity {
 		});
 		animator2.setEvaluator(new TypeEvaluator<Float>() {
 			public Float evaluate(float fraction, Float startValue,
-					Float endValue) {
+								  Float endValue) {
 				return Float.valueOf(String.valueOf(Math
 						.round((startValue - ((startValue - endValue) * fraction)) * 10) / 10.0));
 			}
@@ -431,6 +456,8 @@ public class MainActivity extends Activity {
 				}
 			}
 		}, 0, 50);
+
+
 
 		SharedPreferences settings = getSharedPreferences("temp", 0);
 		SharedPreferences.Editor editor = settings.edit();
@@ -478,6 +505,7 @@ public class MainActivity extends Activity {
 			window.setStatusBarColor(color);
 			window.setNavigationBarColor(color);
 		}
+		mDrawerList.setBackgroundColor(color);
 
 	}
 
@@ -774,6 +802,10 @@ public class MainActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 
+		if (mDrawerToggle.onOptionsItemSelected(item)) {
+			return true;
+		}
+
 		if (id == R.id.login_activity) {
 			Intent loginActivityIntent = new Intent(this, LoginActivity.class);
 			startActivity(loginActivityIntent);
@@ -792,6 +824,23 @@ public class MainActivity extends Activity {
 
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	/* The click listner for ListView in the navigation drawer */
+	private class DrawerItemClickListener implements ListView.OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			selectItem(position);
+		}
+	}
+
+	private void selectItem(int position) {
+		// update the main content by replacing fragments
+		//hier den code einfügen um status eines geräts zu verändern
+
+		// update selected item and title, then close the drawer
+		mDrawerList.setItemChecked(position, true);
+		setTitle(mPlanetTitles[position]);
+		mDrawerLayout.closeDrawer(mDrawerList);
 	}
 
 	@Override
@@ -829,6 +878,18 @@ public class MainActivity extends Activity {
 			timer15s=null;
 		}
 
+	}
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		// Sync the toggle state after onRestoreInstanceState has occurred.
+		mDrawerToggle.syncState();
+	}
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		// Pass any configuration change to the drawer toggls
+		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
 	@SuppressWarnings("resource")

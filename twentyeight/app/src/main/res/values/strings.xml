@@ -9,11 +9,12 @@
     <string name="export_db">DB exportieren</string>
     <string name="delete_db">DB löschen</string>
     <string name="refresh">Aktualisieren</string>
-
+    <string name="openDrawer">Open</string>
+    <string name="closeDrawer">Close</string>
     <string name="dbname">localdb</string>
     <string name="dbversion">1</string>
-    
-     <string-array name="create">
+
+    <string-array name="create">
         <item>      create table temperature(
         id integer primary key autoincrement,
         value REAL,
