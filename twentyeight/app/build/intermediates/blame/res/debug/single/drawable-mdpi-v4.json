@@ -4,6 +4,10 @@
         "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\22.2.1\\res\\drawable-mdpi\\abc_tab_indicator_mtrl_alpha.9.png"
     },
     {
+        "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\kuehlschrank.png",
+        "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-mdpi\\kuehlschrank.png"
+    },
+    {
         "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\abc_btn_check_to_on_mtrl_015.png",
         "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\22.2.1\\res\\drawable-mdpi\\abc_btn_check_to_on_mtrl_015.png"
     },
@@ -144,6 +148,14 @@
         "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-mdpi\\ic_launcher.png"
     },
     {
+        "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\bluetoothspeaker.png",
+        "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-mdpi\\bluetoothspeaker.png"
+    },
+    {
+        "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\lightstripe.png",
+        "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-mdpi\\lightstripe.png"
+    },
+    {
         "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\abc_ic_search_api_mtrl_alpha.png",
         "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\22.2.1\\res\\drawable-mdpi\\abc_ic_search_api_mtrl_alpha.png"
     },
@@ -242,6 +254,10 @@
     {
         "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\abc_ic_menu_share_mtrl_alpha.png",
         "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\22.2.1\\res\\drawable-mdpi\\abc_ic_menu_share_mtrl_alpha.png"
+    },
+    {
+        "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\wasserkocher.png",
+        "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-mdpi\\wasserkocher.png"
     },
     {
         "merged": "D:\\pstiegele\\Documents\\git\\twentyeight2\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\abc_switch_track_mtrl_alpha.9.png",
