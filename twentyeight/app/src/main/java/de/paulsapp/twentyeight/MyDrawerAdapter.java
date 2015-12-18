@@ -1,26 +1,14 @@
 package de.paulsapp.twentyeight;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 
 /**
  * Created by pstiegele on 15.12.2015.
@@ -32,6 +20,7 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
     Context context;
     private String mNavTitles[]; // String Array to store the passed titles Value from MainActivity.java
     private int mIcons[];       // Int Array to store the passed icons resource value from MainActivity.java
+    private boolean mSwitch[]; //Status of the item
     private String name;        //String Resource for header View Name
     private int profile;        //int Resource for header view profile picture
     private String email;       //String Resource for header view email
@@ -40,10 +29,11 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
     // Creating a ViewHolder which extends the RecyclerView View Holder
     // ViewHolder are used to to store the inflated views in order to recycle them
 
-    MyDrawerAdapter(String Titles[], int Icons[], String Name, String Email, int Profile, Context passedContext) { // MyAdapter Constructor with titles and icons parameter
+    MyDrawerAdapter(String Titles[], int Icons[], boolean[] Switch,String Name, String Email, int Profile, Context passedContext) { // MyAdapter Constructor with titles and icons parameter
         // titles, icons, name, email, profile pic are passed from the main activity as we
         mNavTitles = Titles;                //have seen earlier
         mIcons = Icons;
+        mSwitch = Switch;
         name = Name;
         email = Email;
         profile = Profile;                     //here we assign those passed values to the values we declared here
@@ -94,6 +84,7 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
             // position by 1 and pass it to the holder while setting the text and image
             holder.textView.setText(mNavTitles[position - 1]); // Setting the Text with the array of our Titles
             holder.imageView.setImageResource(mIcons[position - 1]);// Settimg the image with array of our icons
+            holder.switcher.setChecked(mSwitch[position-1]);
 
         } else {
 
@@ -122,11 +113,12 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
         return position == 0;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         int Holderid;
 
         TextView textView;
         ImageView imageView;
+        Switch switcher;
         ImageView profile;
         TextView Name;
         TextView email;
@@ -136,13 +128,12 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
             super(itemView);
             contxt = c;
 
-            itemView.setClickable(true);
-            itemView.setOnClickListener(this);
             // Here we set the appropriate view in accordance with the the view type as passed when the holder object is created
 
             if (ViewType == TYPE_ITEM) {
                 textView = (TextView) itemView.findViewById(R.id.drawerItemTitle); // Creating TextView object with the id of textView from item_row.xml
                 imageView = (ImageView) itemView.findViewById(R.id.rowIcon);// Creating ImageView object with the id of ImageView from item_row.xml
+                switcher = (Switch) itemView.findViewById(R.id.drawer_switch_item); // Switch
                 Holderid = 1;                                               // setting holder id as 1 as the object being populated are of type item row
             } else {
 
@@ -154,66 +145,5 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
             }
         }
 
-        @Override
-        public void onClick(View v) {
-            //to get position: getPosition() is the answer
-
-        }
-//
-//
-//            try {
-//                String message = URLEncoder.encode("my message", "UTF-8");
-//                URL url = new URL("http://pstiegele.noip.me:2301");
-//                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//                urlConnection.setDoOutput(true);
-//                urlConnection.setRequestMethod("POST");
-//                OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
-//                writer.write("message=" + message);
-//                writer.close();
-//
-//                if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-//                    urlConnection.setReadTimeout(15 * 1000);
-//                    BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-//                    StringBuilder stringBuilder = new StringBuilder();
-//                    String line = null;
-//                    while ((line = reader.readLine()) != null)
-//                    {
-//                        stringBuilder.append(line + "\n");
-//                    }
-//                    Toast.makeText(contxt,stringBuilder.toString(),Toast.LENGTH_LONG).show();
-//                }
-//                urlConnection.disconnect();
-//            } catch
-//                    (MalformedURLException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//
-//        }
-
-
     }
-//    private class AsyncTaskRunner extends AsyncTask<String, String, Object[]> {
-//        @Override
-//        protected Object[] doInBackground(String... params) {
-//
-//
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Object[] result) {
-//
-//
-//        }
-//
-//        protected void onPreExecute() {
-//
-//        }
-//    }
-//
-//}
-//
 }

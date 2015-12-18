@@ -1,15 +1,27 @@
 package de.paulsapp.twentyeight;
 
-import android.os.AsyncTask;
-
 /**
  * Created by pstiegele on 16.12.2015.
  */
-public class Dosen extends AsyncTask<DoseHttpType,String,DoseStatus> {
+public class Dosen {
 
-    protected Void doInBackground(DoseHttpType type, String name,DoseStatus status){
 
-        return null;
+    public static class SammelParamsStatic {
+        String name;
+        String status;
+        Server server;
+
+        SammelParamsStatic(String name, String status, Server server) {
+            this.name = name;
+            this.status = status;
+            this.server = server;
+        }
+
+        SammelParamsStatic(Server server) {
+            this.server = server;
+        }
+
+
     }
 
 }

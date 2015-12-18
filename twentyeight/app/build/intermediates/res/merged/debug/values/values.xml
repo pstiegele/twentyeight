@@ -38,6 +38,18 @@
         datetime DATETIME
       )
 </item>
+        <item>      create table doseElements(
+        id integer primary key autoincrement,
+        name TEXT,
+        status TEXT,
+        icon  TEXT,
+        shortTimeLimit int,
+        timeSetShort DATETIME,
+        lastTimeSet DATETIME
+      )
+</item>
+
+
     </string-array>
     <attr format="reference" name="drawerArrowStyle"/>
     <attr format="dimension" name="height"/>

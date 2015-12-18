@@ -17,6 +17,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -24,8 +25,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -48,10 +52,22 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -99,8 +115,9 @@ public class MainActivity extends Activity {
     String EMAIL = "pstiegele@stiegele.name";
     int PROFILEPICTURE = R.drawable.profilepicture;
     private Context context;
-    private String[] mDrawerItemsTitles = {"Kühlschrank", "Wasserkocher", "Bluetooth Speaker", "Light Stripe"};
+    private String[] mDrawerItemsTitles;
     private int[] mDrawerItemsIcons = {R.drawable.kuehlschrank, R.drawable.wasserkocher, R.drawable.bluetoothspeaker, R.drawable.lightstripe};
+    private boolean[] mStatus;
     private DrawerLayout mDrawerLayout;
     private RecyclerView mDrawerRecyclerView;
     private RecyclerView.Adapter mDrawerAdapter;
@@ -134,13 +151,13 @@ public class MainActivity extends Activity {
 //		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
 //				R.layout.drawer_list_item, mPlanetTitles));
 
+        loadDrawerTitleAndStatus();
+
         mDrawerRecyclerView.setHasFixedSize(true);
-        mDrawerAdapter = new MyDrawerAdapter(mDrawerItemsTitles, mDrawerItemsIcons, NAME, EMAIL, PROFILEPICTURE,context);
+        mDrawerAdapter = new MyDrawerAdapter(mDrawerItemsTitles, mDrawerItemsIcons, mStatus, NAME, EMAIL, PROFILEPICTURE, context);
         mDrawerRecyclerView.setAdapter(mDrawerAdapter);
         mDrawerLayoutManager = new LinearLayoutManager(this);
         mDrawerRecyclerView.setLayoutManager(mDrawerLayoutManager);
-
-
 
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.openDrawer, R.string.closeDrawer) {
@@ -213,6 +230,10 @@ public class MainActivity extends Activity {
                     ProgressBar pb = (ProgressBar) findViewById(R.id.load_progressbar);
                     pb.setVisibility(android.view.View.VISIBLE);
 
+                    AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
+                    Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
+                    runner.execute(sps);
+
                     updateData(server);
 
                 }
@@ -237,10 +258,85 @@ public class MainActivity extends Activity {
             refreshtv.setOnClickListener(refreshListener);
             refreshtv.setOnLongClickListener(menuListener);
 
+
+            AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
+            Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
+            runner.execute(sps);
+
+        }
+
+
+        final GestureDetector mGestureDetector = new GestureDetector(MainActivity.this, new GestureDetector.SimpleOnGestureListener() {
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+
+        });
+
+        mDrawerRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
+                View child = recyclerView.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
+
+
+                if (child != null && mGestureDetector.onTouchEvent(motionEvent)) {
+                    // mDrawerLayout.closeDrawers();
+                    //Toast.makeText(MainActivity.this, "The Item Clicked is: " + recyclerView.getChildPosition(child), Toast.LENGTH_SHORT).show();
+
+                    mDrawerAdapter.notifyDataSetChanged();
+
+//TODO: hier touch event einfügen
+                    AsyncSetStatusRunner runner = new AsyncSetStatusRunner();
+                    int newStatus;
+                    if (mStatus[recyclerView.getChildPosition(child) - 1]) {
+                        newStatus = 0;    //invertiert, weil Status ja geändert werden soll
+                        mStatus[recyclerView.getChildPosition(child) - 1] = false;
+                    } else {
+                        newStatus = 1;
+                        mStatus[recyclerView.getChildPosition(child) - 1] = true;
+                    }
+                    Dosen.SammelParamsStatic sp = new Dosen.SammelParamsStatic(mDrawerItemsTitles[recyclerView.getChildPosition(child) - 1], String.valueOf(newStatus), server);
+                    mDrawerAdapter.notifyDataSetChanged();
+                    runner.execute(sp);
+                    return true;
+                }
+
+
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
+
+            }
+        });
+
+
+        closeDB();
+
+    }
+
+    public void loadDrawerTitleAndStatus() {
+        openDB(context);
+        Cursor cr = connection.rawQuery("SELECT name,status FROM doseElements", null);
+        mDrawerItemsTitles = new String[cr.getCount()];
+        mStatus = new boolean[cr.getCount()];
+        cr.moveToFirst();
+        for (int i = 0; i < cr.getCount(); i++) {
+            mDrawerItemsTitles[i] = cr.getString(cr.getColumnIndex("name"));
+            if (cr.getInt(cr.getColumnIndex("status")) == 0) {
+                mStatus[i] = false;
+            } else {
+                mStatus[i] = true;
+            }
+            cr.moveToNext();
         }
         closeDB();
 
     }
+
 
     public void updateData(final Server server) {
 
@@ -531,6 +627,7 @@ public class MainActivity extends Activity {
         connection.close();
         database.close();
     }
+
 
     public void refreshtemp() {
         SharedPreferences temp = getSharedPreferences("temp", 0);
@@ -843,8 +940,8 @@ public class MainActivity extends Activity {
         //hier den code einfügen um status eines geräts zu verändern
 
         // update selected item and title, then close the drawer
-      //  mDrawerRecyclerView.setItemChecked(position, true);
-       // setTitle(mPlanetTitles[position]);
+        //  mDrawerRecyclerView.setItemChecked(position, true);
+        // setTitle(mPlanetTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerRecyclerView);
     }
 
@@ -861,6 +958,9 @@ public class MainActivity extends Activity {
             pb.setVisibility(android.view.View.VISIBLE);
 
             updateData(server);
+            AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
+            Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
+            runner.execute(sps);
         }
         if (timer15s == null) {
             timer15s = new Timer();
@@ -939,4 +1039,179 @@ public class MainActivity extends Activity {
         }
     }
 
+    private class AsyncSetStatusRunner extends AsyncTask<Dosen.SammelParamsStatic, String, Boolean> {
+        @Override
+        protected Boolean doInBackground(Dosen.SammelParamsStatic... params) {
+
+            String name = params[0].name;
+            String status = params[0].status;
+            Server server = params[0].server;
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(server.address);
+            JSONObject json = new JSONObject();
+
+            try {
+                // JSON data:
+                json.put("type", "doseSetStatus");
+                json.put("user", server.user);
+                json.put("password", server.password);
+                json.put("doseName", name);
+                json.put("doseStatus", status);
+
+                JSONArray postjson = new JSONArray();
+                postjson.put(json);
+
+                // Post the data:
+                httppost.setHeader("json", json.toString());
+                httppost.getParams().setParameter("jsonpost", postjson);
+
+                // Execute HTTP Post Request
+
+                httpclient.execute(httppost);
+
+
+            } catch (IOException e) {
+                Log.i("paul", e.getLocalizedMessage());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+
+
+        protected void onPostExecute(Object[] result) {
+        }
+
+        protected void onPreExecute() {
+            // Things to be done before execution of long running operation. For
+            // example showing ProgessDialog
+        }
+    }
+
+    private class AsyncGetElementsRunner extends AsyncTask<Dosen.SammelParamsStatic, String, Boolean> {
+        @Override
+        protected Boolean doInBackground(Dosen.SammelParamsStatic... params) {
+            Server server = params[0].server;
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(server.address);
+            JSONObject json = new JSONObject();
+            String strresponse;
+            boolean statusChanges=false;
+
+            try {
+                // JSON data:
+                json.put("type", "doseGetElements");
+                json.put("user", server.user);
+                json.put("password", server.password);
+
+                JSONArray postjson = new JSONArray();
+                postjson.put(json);
+
+                // Post the data:
+                httppost.setHeader("json", json.toString());
+                httppost.getParams().setParameter("jsonpost", postjson);
+
+                // Execute HTTP Post Request
+
+                HttpResponse response = httpclient.execute(httppost);
+
+                // for JSON:
+                if (response != null) {
+                    InputStream is = response.getEntity().getContent();
+
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(is));
+                    StringBuilder sb = new StringBuilder();
+
+                    String line = null;
+                    try {
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line + "\n");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    strresponse = sb.toString();
+                    JSONObject responseJSON = new JSONObject(strresponse);
+                    if (responseJSON.getString("credentials").equals("true")) {
+
+                        // in lokale DB schreiben
+
+                        int count = responseJSON.getInt("count");
+                        String name = "";
+                        DoseStatus status = null;
+                        String icon = "";
+                        int shortTimeLimit = 0;
+                        Date timeSetShort = null;
+                        Date lastTimeSet = null;
+
+                        for (int i = 0; i < count; i++) {
+                            JSONObject job = responseJSON.getJSONArray("content")
+                                    .getJSONObject(i);
+                            name = job.getString("name");
+                            if (job.getInt("status") == 0) {
+                                status = DoseStatus.AUS;
+                            } else {
+                                status = DoseStatus.AN;
+                            }
+
+                            openDB(context);
+                            String sqlstring = "INSERT INTO doseElements (name,status) VALUES ('"
+                                    + name
+                                    + "','"
+                                    + status.getAsInt()
+                                    + "')";
+                            Cursor cr = connection.rawQuery(
+                                    "SELECT name FROM doseElements WHERE name = '" + name + "'",
+                                    null);
+                            if (cr.getCount() == 0) {
+                                connection.execSQL(sqlstring);
+                            } else {
+                                connection.execSQL("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
+                            }
+
+                            if (mStatus.length>=i){
+                               mStatus[i]=status.getAsBoolean();
+                                statusChanges=true;
+                            }
+
+
+                        }
+
+                        closeDB();
+
+                    }
+
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return statusChanges;
+        }
+
+        protected void onPostExecute(Boolean result) {
+            if (result){
+                mDrawerAdapter.notifyDataSetChanged();
+            }
+
+
+        }
+
+        protected void onPreExecute() {
+            // Things to be done before execution of long running operation. For
+            // example showing ProgessDialog
+        }
+    }
 }
