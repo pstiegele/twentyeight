@@ -300,6 +300,9 @@ public class MainActivity extends Activity {
                     Dosen.SammelParamsStatic sp = new Dosen.SammelParamsStatic(mDrawerItemsTitles[recyclerView.getChildPosition(child) - 1], String.valueOf(newStatus), server);
                     mDrawerAdapter.notifyDataSetChanged();
                     runner.execute(sp);
+                    openDB(context);
+                    connection.execSQL("UPDATE \"doseElements\" SET \"status\"='"+newStatus+"' WHERE \"id\" = "+recyclerView.getChildPosition(child));
+                    closeDB();
                     return true;
                 }
 
@@ -1098,7 +1101,7 @@ public class MainActivity extends Activity {
             HttpPost httppost = new HttpPost(server.address);
             JSONObject json = new JSONObject();
             String strresponse;
-            boolean statusChanges=false;
+            boolean statusChanges = false;
 
             try {
                 // JSON data:
@@ -1178,9 +1181,9 @@ public class MainActivity extends Activity {
                                 connection.execSQL("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
                             }
 
-                            if (mStatus.length>=i){
-                               mStatus[i]=status.getAsBoolean();
-                                statusChanges=true;
+                            if (mStatus.length >= i) {
+                                mStatus[i] = status.getAsBoolean();
+                                statusChanges = true;
                             }
 
 
@@ -1202,7 +1205,7 @@ public class MainActivity extends Activity {
         }
 
         protected void onPostExecute(Boolean result) {
-            if (result){
+            if (result) {
                 mDrawerAdapter.notifyDataSetChanged();
             }
 
