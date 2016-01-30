@@ -1562,19 +1562,21 @@ containing a value of this type.
         public static final int abc_textfield_search_material=0x7f02003a;
         public static final int bluetoothspeaker=0x7f02003b;
         public static final int drawer_background=0x7f02003c;
-        public static final int green=0x7f02003d;
-        public static final int house=0x7f02003e;
-        public static final int ic_launcher=0x7f02003f;
-        public static final int kuehlschrank=0x7f020040;
-        public static final int lightstripe=0x7f020041;
-        public static final int map=0x7f020042;
-        public static final int notification_template_icon_bg=0x7f020049;
-        public static final int profilepicture=0x7f020043;
-        public static final int red=0x7f020044;
-        public static final int sanduhr=0x7f020045;
-        public static final int sanduhrgray=0x7f020046;
-        public static final int wasserkocher=0x7f020047;
-        public static final int yellow=0x7f020048;
+        public static final int fernseher=0x7f02003d;
+        public static final int green=0x7f02003e;
+        public static final int house=0x7f02003f;
+        public static final int ic_launcher=0x7f020040;
+        public static final int kuehlschrank=0x7f020041;
+        public static final int lightstripe=0x7f020042;
+        public static final int map=0x7f020043;
+        public static final int notification_template_icon_bg=0x7f02004b;
+        public static final int profilepicture=0x7f020044;
+        public static final int red=0x7f020045;
+        public static final int sanduhr=0x7f020046;
+        public static final int sanduhrgray=0x7f020047;
+        public static final int schreibtischlampe=0x7f020048;
+        public static final int wasserkocher=0x7f020049;
+        public static final int yellow=0x7f02004a;
     }
     public static final class id {
         public static final int action0=0x7f0c006b;

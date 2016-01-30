@@ -116,7 +116,7 @@ public class MainActivity extends Activity {
     int PROFILEPICTURE = R.drawable.profilepicture;
     private Context context;
     private String[] mDrawerItemsTitles;
-    private int[] mDrawerItemsIcons = {R.drawable.kuehlschrank, R.drawable.wasserkocher, R.drawable.bluetoothspeaker, R.drawable.lightstripe};
+    private int[] mDrawerItemsIcons = {R.drawable.schreibtischlampe, R.drawable.fernseher, R.drawable.bluetoothspeaker, R.drawable.lightstripe};
     private boolean[] mStatus;
     private DrawerLayout mDrawerLayout;
     private RecyclerView mDrawerRecyclerView;

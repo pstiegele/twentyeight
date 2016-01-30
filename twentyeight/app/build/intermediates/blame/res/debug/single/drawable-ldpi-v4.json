@@ -1,7 +1,15 @@
 [
     {
+        "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi-v4\\fernseher.png",
+        "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-ldpi\\fernseher.png"
+    },
+    {
         "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi-v4\\bluetoothspeaker.png",
         "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-ldpi\\bluetoothspeaker.png"
+    },
+    {
+        "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi-v4\\schreibtischlampe.png",
+        "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-ldpi\\schreibtischlampe.png"
     },
     {
         "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi-v4\\kuehlschrank.png",
