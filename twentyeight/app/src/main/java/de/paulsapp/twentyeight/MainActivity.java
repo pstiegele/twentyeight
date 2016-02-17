@@ -35,9 +35,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -53,7 +51,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -79,50 +76,38 @@ import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
+
+    /////////////////////
+    //// Variablen /////
+    /////////////////////
     final Runnable Runnable_Chart = new Runnable() {
         public void run() {
             final LineChart chart = (LineChart) findViewById(R.id.chart);
             chart.invalidate();
         }
     };
-    final Handler handler = new Handler();
     public Server server;
+    boolean databaseIsOpen = false;
+    private Handler handler = new Handler();
     final Runnable Runnable_Refresh_Time = new Runnable() {
         public void run() {
-            TextView tv = (TextView) findViewById(R.id.lastrefresh_tv);
-            SharedPreferences temp = getSharedPreferences("temp", 0);
-            long last_refresh = temp.getLong("last_refresh", 0);
-            GregorianCalendar gc_now = new GregorianCalendar();
-            long timediff = gc_now.getTimeInMillis() - last_refresh;
-            int tvtimediff = (int) (timediff / 1000 / 60);
-            if (tvtimediff < 60) {
-                tv.setText("< " + (tvtimediff + 1) + " min");
-            } else if (tvtimediff < 1440) {
-                tv.setText("< " + ((tvtimediff / 60) + 1) + " h");
-            } else {
-                tv.setText("< " + ((tvtimediff / 60 / 24) + 1) + " Tage");
-            }
+            setRefreshTime();
 
-            if (timediff / 1000 / 60 > 5) {
-                updateData(server);
-            }
         }
     };
-    SQLiteOpenHelper database;
-    SQLiteDatabase connection;
-    Timer timer15s;
-    String NAME = "Paul Stiegele";
-    String EMAIL = "pstiegele@stiegele.name";
-    int PROFILEPICTURE = R.drawable.profilepicture;
+    private SQLiteOpenHelper database;
+    private SQLiteDatabase connection;
+    private Timer timer15s;
+
     private Context context;
     private String[] mDrawerItemsTitles;
     private int[] mDrawerItemsIcons = {R.drawable.schreibtischlampe, R.drawable.fernseher, R.drawable.bluetoothspeaker, R.drawable.lightstripe};
-    private boolean[] mStatus;
     private DrawerLayout mDrawerLayout;
     private RecyclerView mDrawerRecyclerView;
     private RecyclerView.Adapter mDrawerAdapter;
-    private RecyclerView.LayoutManager mDrawerLayoutManager;
     private ActionBarDrawerToggle mDrawerToggle;
+    private boolean[] mStatus;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,35 +115,85 @@ public class MainActivity extends Activity {
         setContentView(R.layout.layout_root);
         context = getApplicationContext();
         init(savedInstanceState);
-
-    }
-
-    /* Called whenever we call invalidateOptionsMenu() */
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerRecyclerView);
-        //menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
-        return super.onPrepareOptionsMenu(menu);
     }
 
     public void init(Bundle savedInstanceState) {
 
+        /////////////////
+        //// Drawer /////
+        /////////////////
+        loadDrawerTitleAndStatus();
+        setDrawerPrefs(savedInstanceState);
+
+
+        ////////////////////////
+        /// Background Color ///
+        ////////////////////////
+        initBackgroundColor();
+
+
+        ////////////////////////
+        /// load Credentials ///
+        /// and init Server  ///
+        ////////////////////////
+        loadCredentials(true);
+
+        ////////////////////////
+        ///   init TempChart ///
+        ////////////////////////
+        setInitalTempCharts();
+        setTempChart();
+
+
+        /////////////////////////
+        /// updateDosenStatus ///
+        /////////////////////////
+        updateDosenStatus();
+
+        /////////////////////////
+        ///    init Timer to   //
+        /// update RefreshTime //
+        /////////////////////////
+        initRefreshTimeTimer();
+
+
+        /////////////////////////////////
+        /// set RefreshButtonListener ///
+        /////////////////////////////////
+        setRefreshButtonListener();
+
+    }
+
+    public void loadDrawerTitleAndStatus() {
+        openDB(context);
+        Cursor cr = connection.rawQuery("SELECT name,status FROM doseElements", null);
+        mDrawerItemsTitles = new String[cr.getCount()];
+        mStatus = new boolean[cr.getCount()];
+        cr.moveToFirst();
+        for (int i = 0; i < cr.getCount(); i++) {
+            mDrawerItemsTitles[i] = cr.getString(cr.getColumnIndex("name"));
+            mStatus[i] = cr.getInt(cr.getColumnIndex("status")) == 0;
+            cr.moveToNext();
+        }
+        cr.close();
+        closeDB();
+
+    }
+
+    public void setDrawerPrefs(Bundle savedInstanceState) {
+        String NAME = "Paul Stiegele";
+        String EMAIL = "pstiegele@stiegele.name";
+        int PROFILEPICTURE = R.drawable.profilepicture;
+        RecyclerView.LayoutManager mDrawerLayoutManager;
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.layout_root);
         mDrawerRecyclerView = (RecyclerView) findViewById(R.id.left_drawer);
-
-//		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-//				R.layout.drawer_list_item, mPlanetTitles));
-
-        loadDrawerTitleAndStatus();
 
         mDrawerRecyclerView.setHasFixedSize(true);
         mDrawerAdapter = new MyDrawerAdapter(mDrawerItemsTitles, mDrawerItemsIcons, mStatus, NAME, EMAIL, PROFILEPICTURE, context);
         mDrawerRecyclerView.setAdapter(mDrawerAdapter);
         mDrawerLayoutManager = new LinearLayoutManager(this);
         mDrawerRecyclerView.setLayoutManager(mDrawerLayoutManager);
-
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.openDrawer, R.string.closeDrawer) {
             public void onDrawerClosed(View view) {
@@ -169,100 +204,11 @@ public class MainActivity extends Activity {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
+
+
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         if (savedInstanceState == null) {
             selectItem(0);
-        }
-
-
-        SharedPreferences settings;
-        settings = getSharedPreferences("myprefs", 0);
-        if (settings.contains("rl_color")) {
-            int rl_color = settings.getInt("rl_color", 0);
-            refreshbgcolor(rl_color, false);
-        }
-
-        openDB(context);
-        Cursor credentialscursor = connection.rawQuery(
-                "SELECT url,user,password FROM savedUsers WHERE selected = 1",
-                null);
-
-        if (credentialscursor.getCount() <= 0) {
-
-            Intent loginActivityIntent = new Intent(this, LoginActivity.class);
-            startActivity(loginActivityIntent);
-            finish();
-        } else {
-
-            String url = "";
-            String user = "";
-            String password = "";
-            try {
-                credentialscursor.moveToFirst();
-                url = credentialscursor.getString(credentialscursor
-                        .getColumnIndex("url"));
-                user = credentialscursor.getString(credentialscursor
-                        .getColumnIndex("user"));
-                password = credentialscursor.getString(credentialscursor
-                        .getColumnIndex("password"));
-            } catch (Exception e) {
-                toast("Exception!");
-            }
-
-            server = new Server(url, user, password, context);
-            setInitalTempCharts();
-            setTempChart();
-
-            timer15s = new Timer();
-            timer15s.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    updateRefreshTime();
-                }
-            }, 0, 15 * 1000);
-
-            // updateTempCharts();
-
-            OnClickListener refreshListener = new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    ProgressBar pb = (ProgressBar) findViewById(R.id.load_progressbar);
-                    pb.setVisibility(android.view.View.VISIBLE);
-
-                    AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
-                    Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
-                    runner.execute(sps);
-
-                    updateData(server);
-
-                }
-            };
-
-            OnLongClickListener menuListener = new OnLongClickListener() {
-
-                @Override
-                public boolean onLongClick(View v) {
-
-                    openOptionsMenu();
-                    updateguibarcharts();
-                    return false;
-                }
-            };
-
-            ImageView refreshiv = (ImageView) findViewById(R.id.lastrefresh_iv);
-            refreshiv.setOnClickListener(refreshListener);
-            refreshiv.setOnLongClickListener(menuListener);
-
-            TextView refreshtv = (TextView) findViewById(R.id.lastrefresh_tv);
-            refreshtv.setOnClickListener(refreshListener);
-            refreshtv.setOnLongClickListener(menuListener);
-
-
-            AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
-            Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
-            runner.execute(sps);
-
         }
 
 
@@ -287,7 +233,6 @@ public class MainActivity extends Activity {
 
                     mDrawerAdapter.notifyDataSetChanged();
 
-//TODO: hier touch event einfügen
                     AsyncSetStatusRunner runner = new AsyncSetStatusRunner();
                     int newStatus;
                     if (mStatus[recyclerView.getChildPosition(child) - 1]) {
@@ -301,43 +246,148 @@ public class MainActivity extends Activity {
                     mDrawerAdapter.notifyDataSetChanged();
                     runner.execute(sp);
                     openDB(context);
-                    connection.execSQL("UPDATE \"doseElements\" SET \"status\"='"+newStatus+"' WHERE \"id\" = "+recyclerView.getChildPosition(child));
+                    connection.execSQL("UPDATE \"doseElements\" SET \"status\"='" + newStatus + "' WHERE \"id\" = " + recyclerView.getChildPosition(child));
                     closeDB();
                     return true;
                 }
-
-
                 return false;
             }
 
             @Override
             public void onTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
-
             }
         });
-
-
         closeDB();
+    }
+
+    public void initBackgroundColor() {
+        SharedPreferences settings;
+        settings = getSharedPreferences("myprefs", 0);
+        if (settings.contains("rl_color")) {
+            int rl_color = settings.getInt("rl_color", 0);
+            refreshbgcolor(rl_color, false);
+        }
+    }
+
+    public void loadCredentials(boolean initServer) {
+        String url = "";
+        String user = "";
+        String password = "";
+        openDB(context);
+        Cursor credentialscursor = connection.rawQuery(
+                "SELECT url,user,password FROM savedUsers WHERE selected = 1",
+                null);
+
+        if (credentialscursor.getCount() <= 0) {
+
+            Intent loginActivityIntent = new Intent(this, LoginActivity.class);
+            startActivity(loginActivityIntent);
+            finish();
+        } else {
+
+
+            try {
+                credentialscursor.moveToFirst();
+                url = credentialscursor.getString(credentialscursor
+                        .getColumnIndex("url"));
+                user = credentialscursor.getString(credentialscursor
+                        .getColumnIndex("user"));
+                password = credentialscursor.getString(credentialscursor
+                        .getColumnIndex("password"));
+            } catch (Exception e) {
+                toast("Could not load credentials!");
+            }
+            credentialscursor.close();
+
+            if (initServer) {
+                initServer(url, user, password);
+
+
+            }
+        }
+    }
+
+
+    public void setRefreshTime() {
+        TextView tv = (TextView) findViewById(R.id.lastrefresh_tv);
+        SharedPreferences temp = getSharedPreferences("temp", 0);
+        long last_refresh = temp.getLong("last_refresh", 0);
+        GregorianCalendar gc_now = new GregorianCalendar();
+        long timediff = gc_now.getTimeInMillis() - last_refresh;
+        int tvtimediff = (int) (timediff / 1000 / 60);
+        if (tvtimediff < 60) {
+            tv.setText(getString(R.string.REFRESH_TIME_MIN, (tvtimediff + 1)));
+        } else if (tvtimediff < 1440) {
+            tv.setText(getString(R.string.REFRESH_TIME_HOUR, ((tvtimediff / 60) + 1)));
+        } else {
+            tv.setText(getString(R.string.REFRESH_TIME_DAY, ((tvtimediff / 60 / 24) + 1)));
+        }
+
+        if (timediff / 1000 / 60 > 5) {
+            updateData(server);
+        }
+    }
+
+
+    public void initServer(String url, String user, String password) {
+        server = new Server(url, user, password, context);
+    }
+
+    public void initRefreshTimeTimer() {
+        timer15s = new Timer();
+        timer15s.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updateRefreshTime();
+            }
+        }, 0, 15 * 1000);
 
     }
 
-    public void loadDrawerTitleAndStatus() {
-        openDB(context);
-        Cursor cr = connection.rawQuery("SELECT name,status FROM doseElements", null);
-        mDrawerItemsTitles = new String[cr.getCount()];
-        mStatus = new boolean[cr.getCount()];
-        cr.moveToFirst();
-        for (int i = 0; i < cr.getCount(); i++) {
-            mDrawerItemsTitles[i] = cr.getString(cr.getColumnIndex("name"));
-            if (cr.getInt(cr.getColumnIndex("status")) == 0) {
-                mStatus[i] = false;
-            } else {
-                mStatus[i] = true;
-            }
-            cr.moveToNext();
-        }
-        closeDB();
+    public void setRefreshButtonListener() {
+        OnClickListener refreshListener = new OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                ProgressBar pb = (ProgressBar) findViewById(R.id.load_progressbar);
+                pb.setVisibility(android.view.View.VISIBLE);
+
+                AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
+                Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
+                runner.execute(sps);
+
+                updateData(server);
+
+            }
+        };
+
+        OnLongClickListener menuListener = new OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+
+                openOptionsMenu();
+                updateguibarcharts();
+                return false;
+            }
+        };
+
+
+        ImageView refreshiv = (ImageView) findViewById(R.id.lastrefresh_iv);
+        refreshiv.setOnClickListener(refreshListener);
+        refreshiv.setOnLongClickListener(menuListener);
+
+        TextView refreshtv = (TextView) findViewById(R.id.lastrefresh_tv);
+        refreshtv.setOnClickListener(refreshListener);
+        refreshtv.setOnLongClickListener(menuListener);
+
+
+    }
+
+    public void updateDosenStatus() {
+        AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
+        Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
+        runner.execute(sps);
     }
 
 
@@ -347,7 +397,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void selectIsReady(boolean result) { // aktuelle Temp geladen
-                updateguilinecharts(server);
+
 
             }
         });
@@ -366,7 +416,7 @@ public class MainActivity extends Activity {
                     SharedPreferences.Editor editor = settings.edit();
                     GregorianCalendar gc = new GregorianCalendar();
                     editor.putLong("last_refresh", gc.getTimeInMillis());
-                    editor.commit();
+                    editor.apply();
                     updateRefreshTime();
 
                 }
@@ -392,9 +442,6 @@ public class MainActivity extends Activity {
         updateTempCharts();
     }
 
-    public void updateguilinecharts(Server server) { // Temperaturverlauf
-
-    }
 
     @SuppressWarnings("deprecation")
     public void setInitalTempCharts() {
@@ -414,8 +461,13 @@ public class MainActivity extends Activity {
         tv_innen.setTextColor(colorSettings
                 .getInt("tv_colorInnen", Color.WHITE));
 
-        tv_aussen.setText(Math.round(getnewesttempentry(1) * 10) / 10.0 + "°");
-        tv_innen.setText(Math.round(getnewesttempentry(2) * 10) / 10.0 + "°");
+        // tv_aussen.setText(Math.round(getnewesttempentry(1) * 10) / 10.0 + "°");
+        // tv_innen.setText(Math.round(getnewesttempentry(2) * 10) / 10.0 + "°");
+
+
+        tv_aussen.setText(getString(R.string.CHART_DEGREE, getnewesttempentry(1)).replace(",", "."));
+        tv_innen.setText(getString(R.string.CHART_DEGREE, getnewesttempentry(2)).replace(",", "."));
+
 
         tv_refresh.setTextColor(colorSettings.getInt("refreshColor",
                 Color.WHITE));
@@ -441,7 +493,7 @@ public class MainActivity extends Activity {
                 (float) (Math.round(getnewesttempentry(1) * 10) / 10.0));
         editor.putFloat("temp_innen_start",
                 (float) (Math.round(getnewesttempentry(2) * 10) / 10.0));
-        editor.commit();
+        editor.apply();
     }
 
     public void updateTempCharts() {
@@ -516,8 +568,7 @@ public class MainActivity extends Activity {
         animator.setFloatValues(aussen_alt, (float) getnewesttempentry(1));
         animator.addUpdateListener(new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
-                tv_aussen.setText(String.valueOf(animation.getAnimatedValue())
-                        + "°");
+                tv_aussen.setText(getString(R.string.CHART_DEGREE_STRING, String.valueOf(animation.getAnimatedValue())));
             }
         });
         animator.setEvaluator(new TypeEvaluator<Float>() {
@@ -533,8 +584,7 @@ public class MainActivity extends Activity {
         animator2.setFloatValues(innen_alt, (float) getnewesttempentry(2));
         animator2.addUpdateListener(new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
-                tv_innen.setText(String.valueOf(animation.getAnimatedValue())
-                        + "°");
+                tv_innen.setText(getString(R.string.CHART_DEGREE_STRING, String.valueOf(animation.getAnimatedValue())));
             }
         });
         animator2.setEvaluator(new TypeEvaluator<Float>() {
@@ -576,7 +626,7 @@ public class MainActivity extends Activity {
                 (float) (Math.round(getnewesttempentry(1) * 10) / 10.0));
         editor.putFloat("temp_innen_start",
                 (float) (Math.round(getnewesttempentry(2) * 10) / 10.0));
-        editor.commit();
+        editor.apply();
 
     }
 
@@ -621,14 +671,20 @@ public class MainActivity extends Activity {
     }
 
     public SQLiteDatabase openDB(Context context) {
-        database = new LocalDBHandler(context);
-        connection = database.getReadableDatabase();
+        if (!databaseIsOpen) {
+            database = new LocalDBHandler(context);
+            connection = database.getReadableDatabase();
+            databaseIsOpen = true;
+        }
         return connection;
     }
 
     public void closeDB() {
-        connection.close();
-        database.close();
+        if (databaseIsOpen) {
+            connection.close();
+            database.close();
+            databaseIsOpen = false;
+        }
     }
 
 
@@ -646,15 +702,15 @@ public class MainActivity extends Activity {
         // Überschrift Text Farbe ermitteln (schwarz / weiß)
         double tvtc = (299 * Color.red(hsv) + 587 * Color.green(hsv) + 114 * Color
                 .blue(hsv)) / 1000;
-        int tvColorAussen = 0;
-        int tvColorInnen = 0;
-        int refreshColor = 0;
-        int chartColor = 0;
-        int sanduhrColor = 0;
-        int houseColor = 0;
-        int trendcurveColorInnen = 0;
-        int trendcurveColorAussen = 0;
-        int chartValueColor = 0;
+        int tvColorAussen;
+        int tvColorInnen;
+        int refreshColor;
+        int chartColor;
+        int sanduhrColor;
+        int houseColor;
+        int trendcurveColorInnen;
+        int trendcurveColorAussen;
+        int chartValueColor;
         if (tvtc >= 128) { // wenn Hell
             tvColorAussen = Color.WHITE;
             tvColorInnen = Color.GRAY;
@@ -699,7 +755,7 @@ public class MainActivity extends Activity {
         editor.putInt("trendcurveColorAussen", trendcurveColorAussen);
         editor.putInt("chartValueColor", chartValueColor);
         editor.putInt("rl_color", hsv);
-        editor.commit();
+        editor.apply();
 
     }
 
@@ -749,8 +805,8 @@ public class MainActivity extends Activity {
 
     public void setChartData1(LineChart chart) {
         // TEMP AUSSEN ANFANG
-        ArrayList<String> xValues1 = new ArrayList<String>();
-        ArrayList<Entry> values1 = new ArrayList<Entry>();
+        ArrayList<String> xValues1 = new ArrayList<>();
+        ArrayList<Entry> values1 = new ArrayList<>();
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd' '00:00:00",
                 Locale.GERMANY);
         Date d = new Date();
@@ -763,14 +819,14 @@ public class MainActivity extends Activity {
                 + "' GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime";
         Cursor cr1 = connection.rawQuery(query, null);
         cr1.moveToFirst();
-        int year = 0;
-        int month = 0;
-        int day = 0;
-        int hour = 0;
-        int minute = 0;
-        int second = 0;
-        String date = "";
-        String day_of_week = "";
+        int year;
+        int month;
+        int day;
+        int hour;
+        int minute;
+        int second;
+        String date;
+        String day_of_week;
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.GERMANY);
         for (int i = 0; i < cr1.getCount(); i++) {
             // Datetime
@@ -784,7 +840,6 @@ public class MainActivity extends Activity {
             GregorianCalendar g = new GregorianCalendar(year, month, day, hour,
                     minute, second);
 
-            // TODO: Scrollen in die Vergangenheit ermöglichen
 
             if (datenow.get(GregorianCalendar.YEAR) == g
                     .get(GregorianCalendar.YEAR)
@@ -815,6 +870,7 @@ public class MainActivity extends Activity {
             values1.add(new Entry(cr1.getFloat(cr1.getColumnIndex("value")), i));
             cr1.moveToNext();
         }
+        cr1.close();
 
         LineDataSet set1 = new LineDataSet(values1, "Aussen");
         set1.setDrawCubic(true);
@@ -830,8 +886,8 @@ public class MainActivity extends Activity {
 
         // TEMP AUSSEN ENDE
         // TEMP INNEN ANFANG
-        ArrayList<String> xValues2 = new ArrayList<String>();
-        ArrayList<Entry> values2 = new ArrayList<Entry>();
+        //ArrayList<String> xValues2 = new ArrayList<>();
+        ArrayList<Entry> values2 = new ArrayList<>();
 
         Cursor cr2 = connection
                 .rawQuery(
@@ -841,16 +897,17 @@ public class MainActivity extends Activity {
                                 + "' GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime",
                         null);
         cr2.moveToFirst();
-        date = "";
+        //  date = "";
         for (int i = 0; i < cr2.getCount(); i++) {
             // Datetime
-            date = cr2.getString(cr2.getColumnIndex("datetime"));
-            date = date.substring(8, 10) + "." + date.substring(5, 7) + "."
-                    + date.substring(0, 4);
-            xValues2.add(date);
+            //       date = cr2.getString(cr2.getColumnIndex("datetime"));
+            //      date = date.substring(8, 10) + "." + date.substring(5, 7) + "."
+            //               + date.substring(0, 4);
+            //  xValues2.add(date);
             values2.add(new Entry(cr2.getFloat(cr2.getColumnIndex("value")), i));
             cr2.moveToNext();
         }
+        cr2.close();
 
         LineDataSet set2 = new LineDataSet(values2, "Innen");
         set2.setDrawCubic(true);
@@ -865,7 +922,7 @@ public class MainActivity extends Activity {
         set2.setFillColor(ColorTemplate.getHoloBlue());
         // TEMP INNEN ENDE
 
-        ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
+        ArrayList<LineDataSet> dataSets = new ArrayList<>();
         dataSets.add(set1);
         dataSets.add(set2);
 
@@ -897,7 +954,7 @@ public class MainActivity extends Activity {
     public void toast(String text) {
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT)
                 .show();
-        ;
+
     }
 
     @Override
@@ -941,7 +998,9 @@ public class MainActivity extends Activity {
     private void selectItem(int position) {
         // update the main content by replacing fragments
         //hier den code einfügen um status eines geräts zu verändern
-
+        if (position == 4122) {
+            toast("krass");
+        }
         // update selected item and title, then close the drawer
         //  mDrawerRecyclerView.setItemChecked(position, true);
         // setTitle(mPlanetTitles[position]);
@@ -1006,14 +1065,13 @@ public class MainActivity extends Activity {
     private void exportDB() {
         File sd = Environment.getExternalStorageDirectory();
         File data = Environment.getDataDirectory();
-        FileChannel source = null;
-        FileChannel destination = null;
+        FileChannel source;
+        FileChannel destination;
         String dbname = context.getResources().getString(R.string.dbname);
         String currentDBPath = "/data/" + "de.paulsapp.twentyeight"
                 + "/databases/" + dbname;
-        String backupDBPath = dbname;
         File currentDB = new File(data, currentDBPath);
-        File backupDB = new File(sd, backupDBPath);
+        File backupDB = new File(sd, dbname);
         try {
             source = new FileInputStream(currentDB).getChannel();
             destination = new FileOutputStream(backupDB).getChannel();
@@ -1029,19 +1087,20 @@ public class MainActivity extends Activity {
     private void deleteDB() {
         String dbname = context.getResources().getString(R.string.dbname);
         boolean result = this.deleteDatabase(dbname);
-        if (result == true) {
+        if (result) {
             Toast.makeText(this, "DB Deleted!", Toast.LENGTH_LONG).show();
         }
     }
 
     /* The click listner for ListView in the navigation drawer */
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
-    }
+//    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+//        @Override
+//        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//            selectItem(position);
+//        }
+//    }
 
+    @SuppressWarnings("deprecation")
     private class AsyncSetStatusRunner extends AsyncTask<Dosen.SammelParamsStatic, String, Boolean> {
         @Override
         protected Boolean doInBackground(Dosen.SammelParamsStatic... params) {
@@ -1083,15 +1142,13 @@ public class MainActivity extends Activity {
         }
 
 
-        protected void onPostExecute(Object[] result) {
-        }
-
         protected void onPreExecute() {
             // Things to be done before execution of long running operation. For
             // example showing ProgessDialog
         }
     }
 
+    @SuppressWarnings("deprecation")
     private class AsyncGetElementsRunner extends AsyncTask<Dosen.SammelParamsStatic, String, Boolean> {
         @Override
         protected Boolean doInBackground(Dosen.SammelParamsStatic... params) {
@@ -1128,10 +1185,10 @@ public class MainActivity extends Activity {
                             new InputStreamReader(is));
                     StringBuilder sb = new StringBuilder();
 
-                    String line = null;
+                    String line;
                     try {
                         while ((line = reader.readLine()) != null) {
-                            sb.append(line + "\n");
+                            sb.append(line).append("\n");
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -1149,12 +1206,12 @@ public class MainActivity extends Activity {
                         // in lokale DB schreiben
 
                         int count = responseJSON.getInt("count");
-                        String name = "";
-                        DoseStatus status = null;
-                        String icon = "";
-                        int shortTimeLimit = 0;
-                        Date timeSetShort = null;
-                        Date lastTimeSet = null;
+                        String name;
+                        DoseStatus status;
+                        //    String icon;
+                        //   int shortTimeLimit;
+                        //   Date timeSetShort = null;
+                        //  Date lastTimeSet = null;
 
                         for (int i = 0; i < count; i++) {
                             JSONObject job = responseJSON.getJSONArray("content")
@@ -1180,7 +1237,7 @@ public class MainActivity extends Activity {
                             } else {
                                 connection.execSQL("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
                             }
-
+                            cr.close();
                             if (mStatus.length >= i) {
                                 mStatus[i] = status.getAsBoolean();
                                 statusChanges = true;
@@ -1194,11 +1251,7 @@ public class MainActivity extends Activity {
                     }
 
                 }
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
             return statusChanges;

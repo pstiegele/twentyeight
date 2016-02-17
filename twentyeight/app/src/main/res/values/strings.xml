@@ -13,6 +13,11 @@
     <string name="closeDrawer">Close</string>
     <string name="dbname">localdb</string>
     <string name="dbversion">1</string>
+    <string name="REFRESH_TIME_MIN">&lt; %1$d min</string>
+    <string name="REFRESH_TIME_HOUR">&lt; %1$d h</string>
+    <string name="REFRESH_TIME_DAY">&lt; %1$d Tage</string>
+    <string name="CHART_DEGREE">%1$.1f°</string>
+    <string name="CHART_DEGREE_STRING">%1$s°</string>
 
     <string-array name="create">
         <item>      create table temperature(

@@ -239,6 +239,11 @@
     <integer name="abc_max_action_buttons">2</integer>
     <integer name="cancel_button_image_alpha">127</integer>
     <integer name="status_bar_notification_info_maxnum">999</integer>
+    <string name="CHART_DEGREE">%1$.1f°</string>
+    <string name="CHART_DEGREE_STRING">%1$s°</string>
+    <string name="REFRESH_TIME_DAY">&lt; %1$d Tage</string>
+    <string name="REFRESH_TIME_HOUR">&lt; %1$d h</string>
+    <string name="REFRESH_TIME_MIN">&lt; %1$d min</string>
     <string name="abc_action_bar_home_description">Navigate home</string>
     <string name="abc_action_bar_home_description_format">%1$s, %2$s</string>
     <string name="abc_action_bar_home_subtitle_description_format">%1$s, %2$s, %3$s</string>
