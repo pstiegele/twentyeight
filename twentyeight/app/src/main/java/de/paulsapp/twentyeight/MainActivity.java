@@ -11,8 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -21,15 +19,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -86,8 +78,7 @@ public class MainActivity extends Activity {
             chart.invalidate();
         }
     };
-    public Server server;
-    boolean databaseIsOpen = false;
+    public static Server server;
     private Handler handler = new Handler();
     final Runnable Runnable_Refresh_Time = new Runnable() {
         public void run() {
@@ -95,18 +86,10 @@ public class MainActivity extends Activity {
 
         }
     };
-    private SQLiteOpenHelper database;
-    private SQLiteDatabase connection;
     private Timer timer15s;
-
     private Context context;
-    private String[] mDrawerItemsTitles;
-    private int[] mDrawerItemsIcons = {R.drawable.schreibtischlampe, R.drawable.fernseher, R.drawable.bluetoothspeaker, R.drawable.lightstripe};
-    private DrawerLayout mDrawerLayout;
-    private RecyclerView mDrawerRecyclerView;
-    private RecyclerView.Adapter mDrawerAdapter;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private boolean[] mStatus;
+    public static Database db;
+    private Drawer drawer;
 
 
     @Override
@@ -118,12 +101,17 @@ public class MainActivity extends Activity {
     }
 
     public void init(Bundle savedInstanceState) {
+        ////////////////////////
+        ///// Init Database ////
+        ////////////////////////
+        db = new Database(context);
 
         /////////////////
         //// Drawer /////
         /////////////////
-        loadDrawerTitleAndStatus();
-        setDrawerPrefs(savedInstanceState);
+        drawer = new Drawer(context,this);
+        drawer.loadDrawerTitleAndStatus();
+        drawer.setDrawerPrefs(savedInstanceState);
 
 
         ////////////////////////
@@ -164,104 +152,6 @@ public class MainActivity extends Activity {
 
     }
 
-    public void loadDrawerTitleAndStatus() {
-        openDB(context);
-        Cursor cr = connection.rawQuery("SELECT name,status FROM doseElements", null);
-        mDrawerItemsTitles = new String[cr.getCount()];
-        mStatus = new boolean[cr.getCount()];
-        cr.moveToFirst();
-        for (int i = 0; i < cr.getCount(); i++) {
-            mDrawerItemsTitles[i] = cr.getString(cr.getColumnIndex("name"));
-            mStatus[i] = cr.getInt(cr.getColumnIndex("status")) == 0;
-            cr.moveToNext();
-        }
-        cr.close();
-        closeDB();
-
-    }
-
-    public void setDrawerPrefs(Bundle savedInstanceState) {
-//        String NAME = "Paul Stiegele";
-//        String EMAIL = "paul@stiegele.name";
-//        int PROFILEPICTURE = R.drawable.profilepicture;
-        String NAME = "";
-        String EMAIL = "";
-        int PROFILEPICTURE = R.drawable.ic_account_circle_white_48dp;
-        RecyclerView.LayoutManager mDrawerLayoutManager;
-
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.layout_root);
-        mDrawerRecyclerView = (RecyclerView) findViewById(R.id.left_drawer);
-
-        mDrawerRecyclerView.setHasFixedSize(true);
-        mDrawerAdapter = new MyDrawerAdapter(mDrawerItemsTitles, mDrawerItemsIcons, mStatus, NAME, EMAIL, PROFILEPICTURE, context);
-        mDrawerRecyclerView.setAdapter(mDrawerAdapter);
-        mDrawerLayoutManager = new LinearLayoutManager(this);
-        mDrawerRecyclerView.setLayoutManager(mDrawerLayoutManager);
-
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.openDrawer, R.string.closeDrawer) {
-            public void onDrawerClosed(View view) {
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-
-
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        if (savedInstanceState == null) {
-            selectItem(0);
-        }
-
-
-        final GestureDetector mGestureDetector = new GestureDetector(MainActivity.this, new GestureDetector.SimpleOnGestureListener() {
-
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                return true;
-            }
-
-        });
-
-        mDrawerRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
-                View child = recyclerView.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
-
-
-                if (child != null && mGestureDetector.onTouchEvent(motionEvent)) {
-                    // mDrawerLayout.closeDrawers();
-                    //Toast.makeText(MainActivity.this, "The Item Clicked is: " + recyclerView.getChildPosition(child), Toast.LENGTH_SHORT).show();
-
-                    mDrawerAdapter.notifyDataSetChanged();
-
-                    AsyncSetStatusRunner runner = new AsyncSetStatusRunner();
-                    int newStatus;
-                    if (mStatus[recyclerView.getChildPosition(child) - 1]) {
-                        newStatus = 0;    //invertiert, weil Status ja geändert werden soll
-                        mStatus[recyclerView.getChildPosition(child) - 1] = false;
-                    } else {
-                        newStatus = 1;
-                        mStatus[recyclerView.getChildPosition(child) - 1] = true;
-                    }
-                    Dosen.SammelParamsStatic sp = new Dosen.SammelParamsStatic(mDrawerItemsTitles[recyclerView.getChildPosition(child) - 1], String.valueOf(newStatus), server);
-                    mDrawerAdapter.notifyDataSetChanged();
-                    runner.execute(sp);
-                    openDB(context);
-                    connection.execSQL("UPDATE \"doseElements\" SET \"status\"='" + newStatus + "' WHERE \"id\" = " + recyclerView.getChildPosition(child));
-                    closeDB();
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void onTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
-            }
-        });
-        closeDB();
-    }
 
     public void initBackgroundColor() {
         SharedPreferences settings;
@@ -276,31 +166,24 @@ public class MainActivity extends Activity {
         String url = "";
         String user = "";
         String password = "";
-        openDB(context);
-        Cursor credentialscursor = connection.rawQuery(
-                "SELECT url,user,password FROM savedUsers WHERE selected = 1",
-                null);
+        Cursor crs = db.getRawQuery("SELECT url,user,password FROM savedUsers WHERE selected = 1");
 
-        if (credentialscursor.getCount() <= 0) {
-
+        if (crs.getCount() <= 0) {
             Intent loginActivityIntent = new Intent(this, LoginActivity.class);
             startActivity(loginActivityIntent);
             finish();
         } else {
-
-
             try {
-                credentialscursor.moveToFirst();
-                url = credentialscursor.getString(credentialscursor
+                url = crs.getString(crs
                         .getColumnIndex("url"));
-                user = credentialscursor.getString(credentialscursor
+                user = crs.getString(crs
                         .getColumnIndex("user"));
-                password = credentialscursor.getString(credentialscursor
+                password = crs.getString(crs
                         .getColumnIndex("password"));
             } catch (Exception e) {
                 toast("Could not load credentials!");
             }
-            credentialscursor.close();
+            crs.close();
 
             if (initServer) {
                 initServer(url, user, password);
@@ -327,7 +210,7 @@ public class MainActivity extends Activity {
         }
 
         if (timediff / 1000 / 60 > 5) {
-            if(server!=null){
+            if (server != null) {
                 updateData(server);
             }
 
@@ -358,10 +241,8 @@ public class MainActivity extends Activity {
                 ProgressBar pb = (ProgressBar) findViewById(R.id.load_progressbar);
                 pb.setVisibility(android.view.View.VISIBLE);
 
-                AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
-                Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
-                runner.execute(sps);
 
+                drawer.updateDose();
                 updateData(server);
 
             }
@@ -391,10 +272,8 @@ public class MainActivity extends Activity {
     }
 
     public void updateDosenStatus() {
-        if(server!=null){
-            AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
-            Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
-            runner.execute(sps);
+        if (server != null) {
+           drawer.updateDose();
         }
 
     }
@@ -679,23 +558,6 @@ public class MainActivity extends Activity {
 
     }
 
-    public SQLiteDatabase openDB(Context context) {
-        if (!databaseIsOpen) {
-            database = new LocalDBHandler(context);
-            connection = database.getReadableDatabase();
-            databaseIsOpen = true;
-        }
-        return connection;
-    }
-
-    public void closeDB() {
-        if (databaseIsOpen) {
-            connection.close();
-            database.close();
-            databaseIsOpen = false;
-        }
-    }
-
 
     public void refreshtemp() {
         SharedPreferences temp = getSharedPreferences("temp", 0);
@@ -826,8 +688,7 @@ public class MainActivity extends Activity {
         String query = "SELECT datetime, Max(value) AS value FROM temperature where sensorid=1 AND datetime> '"
                 + parser.format(d)
                 + "' GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime";
-        Cursor cr1 = connection.rawQuery(query, null);
-        cr1.moveToFirst();
+        Cursor cr1 = db.getRawQuery(query);
         int year;
         int month;
         int day;
@@ -857,9 +718,8 @@ public class MainActivity extends Activity {
                 day_of_week = "Heute        "; // unsichtbare Zeichen dahinter
                 // damits ins Layout passt
             } else if (datenow.get(GregorianCalendar.YEAR) == g
-                    .get(GregorianCalendar.YEAR)
-                    && datenow.get(GregorianCalendar.DAY_OF_YEAR) - 1 == g
-                    .get(GregorianCalendar.DAY_OF_YEAR)) {
+                    .get(GregorianCalendar.YEAR) && (datenow.get(GregorianCalendar.DAY_OF_YEAR)) == g
+                    .get(GregorianCalendar.DAY_OF_YEAR) + 1) {
 
                 day_of_week = "Gestern";
 
@@ -897,15 +757,10 @@ public class MainActivity extends Activity {
         // TEMP INNEN ANFANG
         //ArrayList<String> xValues2 = new ArrayList<>();
         ArrayList<Entry> values2 = new ArrayList<>();
-
-        Cursor cr2 = connection
-                .rawQuery(
-                        // "SELECT datetime, Max(value) AS value FROM temperature where sensorid=2 GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime",
-                        "SELECT datetime, Max(value) AS value FROM temperature where sensorid=2 AND datetime> '"
-                                + parser.format(d)
-                                + "' GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime",
-                        null);
-        cr2.moveToFirst();
+        String query2 = "SELECT datetime, Max(value) AS value FROM temperature where sensorid=2 AND datetime> '"
+                + parser.format(d)
+                + "' GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime";
+        Cursor cr2 = db.getRawQuery(query2);
         //  date = "";
         for (int i = 0; i < cr2.getCount(); i++) {
             // Datetime
@@ -980,7 +835,7 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
+        if (drawer.mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
@@ -1002,7 +857,7 @@ public class MainActivity extends Activity {
 
         }
         if (id == R.id.coldRefresh) {
-           //TODO: Kaltstart einfügen
+            //TODO: Kaltstart einfügen
             AsyncGetAllElementsColdRefresh runner = new AsyncGetAllElementsColdRefresh();
             runner.execute(server);
 
@@ -1010,17 +865,6 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void selectItem(int position) {
-        // update the main content by replacing fragments
-        //hier den code einfügen um status eines geräts zu verändern
-        if (position == 4122) {
-            toast("krass");
-        }
-        // update selected item and title, then close the drawer
-        //  mDrawerRecyclerView.setItemChecked(position, true);
-        // setTitle(mPlanetTitles[position]);
-        mDrawerLayout.closeDrawer(mDrawerRecyclerView);
-    }
 
     @Override
     public void onResume() {
@@ -1035,9 +879,7 @@ public class MainActivity extends Activity {
             pb.setVisibility(android.view.View.VISIBLE);
 
             updateData(server);
-            AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
-            Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
-            runner.execute(sps);
+            drawer.updateDose();
         }
         if (timer15s == null) {
             timer15s = new Timer();
@@ -1066,14 +908,14 @@ public class MainActivity extends Activity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
+        drawer.mDrawerToggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        drawer.mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @SuppressWarnings("resource")
@@ -1115,176 +957,8 @@ public class MainActivity extends Activity {
 //        }
 //    }
 
-    @SuppressWarnings("deprecation")
-    private class AsyncSetStatusRunner extends AsyncTask<Dosen.SammelParamsStatic, String, Boolean> {
-        @Override
-        protected Boolean doInBackground(Dosen.SammelParamsStatic... params) {
-
-            String name = params[0].name;
-            String status = params[0].status;
-            Server server = params[0].server;
-            // Create a new HttpClient and Post Header
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(server.address);
-            JSONObject json = new JSONObject();
-
-            try {
-                // JSON data:
-                json.put("type", "doseSetStatus");
-                json.put("user", server.user);
-                json.put("password", server.password);
-                json.put("doseName", name);
-                json.put("doseStatus", status);
-
-                JSONArray postjson = new JSONArray();
-                postjson.put(json);
-
-                // Post the data:
-                httppost.setHeader("json", json.toString());
-                httppost.getParams().setParameter("jsonpost", postjson);
-
-                // Execute HTTP Post Request
-
-                httpclient.execute(httppost);
 
 
-            } catch (IOException e) {
-                Log.i("paul", e.getLocalizedMessage());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-
-
-        protected void onPreExecute() {
-            // Things to be done before execution of long running operation. For
-            // example showing ProgessDialog
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    private class AsyncGetElementsRunner extends AsyncTask<Dosen.SammelParamsStatic, String, Boolean> {
-        @Override
-        protected Boolean doInBackground(Dosen.SammelParamsStatic... params) {
-            Server server = params[0].server;
-            // Create a new HttpClient and Post Header
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(server.address);
-            JSONObject json = new JSONObject();
-            String strresponse;
-            boolean statusChanges = false;
-
-            try {
-                // JSON data:
-                json.put("type", "doseGetElements");
-                json.put("user", server.user);
-                json.put("password", server.password);
-
-                JSONArray postjson = new JSONArray();
-                postjson.put(json);
-
-                // Post the data:
-                httppost.setHeader("json", json.toString());
-                httppost.getParams().setParameter("jsonpost", postjson);
-
-                // Execute HTTP Post Request
-
-                HttpResponse response = httpclient.execute(httppost);
-
-                // for JSON:
-                if (response != null) {
-                    InputStream is = response.getEntity().getContent();
-
-                    BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(is));
-                    StringBuilder sb = new StringBuilder();
-
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line).append("\n");
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    strresponse = sb.toString();
-                    JSONObject responseJSON = new JSONObject(strresponse);
-                    if (responseJSON.getString("credentials").equals("true")) {
-
-                        // in lokale DB schreiben
-
-                        int count = responseJSON.getInt("count");
-                        String name;
-                        DoseStatus status;
-                        //    String icon;
-                        //   int shortTimeLimit;
-                        //   Date timeSetShort = null;
-                        //  Date lastTimeSet = null;
-
-                        for (int i = 0; i < count; i++) {
-                            JSONObject job = responseJSON.getJSONArray("content")
-                                    .getJSONObject(i);
-                            name = job.getString("name");
-                            if (job.getInt("status") == 0) {
-                                status = DoseStatus.AUS;
-                            } else {
-                                status = DoseStatus.AN;
-                            }
-
-                            openDB(context);
-                            String sqlstring = "INSERT INTO doseElements (name,status) VALUES ('"
-                                    + name
-                                    + "','"
-                                    + status.getAsInt()
-                                    + "')";
-                            Cursor cr = connection.rawQuery(
-                                    "SELECT name FROM doseElements WHERE name = '" + name + "'",
-                                    null);
-                            if (cr.getCount() == 0) {
-                                connection.execSQL(sqlstring);
-                            } else {
-                                connection.execSQL("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
-                            }
-                            cr.close();
-                            if (mStatus.length >= i) {
-                                mStatus[i] = status.getAsBoolean();
-                                statusChanges = true;
-                            }
-
-
-                        }
-
-                        closeDB();
-
-                    }
-
-                }
-            } catch (JSONException | IOException e) {
-                e.printStackTrace();
-            }
-            return statusChanges;
-        }
-
-        protected void onPostExecute(Boolean result) {
-            if (result) {
-                mDrawerAdapter.notifyDataSetChanged();
-            }
-
-
-        }
-
-        protected void onPreExecute() {
-            // Things to be done before execution of long running operation. For
-            // example showing ProgessDialog
-        }
-    }
 
     //Allgemeine Infos Anfang
     @SuppressWarnings("deprecation")
@@ -1362,23 +1036,21 @@ public class MainActivity extends Activity {
                                 status = DoseStatus.AN;
                             }
 
-                            openDB(context);
                             String sqlstring = "INSERT INTO doseElements (name,status) VALUES ('"
                                     + name
                                     + "','"
                                     + status.getAsInt()
                                     + "')";
-                            Cursor cr = connection.rawQuery(
-                                    "SELECT name FROM doseElements WHERE name = '" + name + "'",
-                                    null);
+                            Cursor cr = db.getRawQuery(
+                                    "SELECT name FROM doseElements WHERE name = '" + name + "'");
                             if (cr.getCount() == 0) {
-                                connection.execSQL(sqlstring);
+                                db.execSQLString(sqlstring);
                             } else {
-                                connection.execSQL("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
+                                db.execSQLString("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
                             }
                             cr.close();
-                            if (mStatus.length >= i) {
-                                mStatus[i] = status.getAsBoolean();
+                            if (drawer.mStatus.length >= i) {
+                                drawer.mStatus[i] = status.getAsBoolean();
                                 statusChanges = true;
                             }
 
@@ -1387,7 +1059,7 @@ public class MainActivity extends Activity {
 
                         //TODO: Name, permission, description
 
-                        closeDB();
+
 
                     }
 
@@ -1400,7 +1072,7 @@ public class MainActivity extends Activity {
 
         protected void onPostExecute(Boolean result) {
             if (result) {
-                mDrawerAdapter.notifyDataSetChanged();
+                drawer.mDrawerAdapter.notifyDataSetChanged();
             }
 
 

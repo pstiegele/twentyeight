@@ -30,7 +30,7 @@ public class Server {
 
 	String address = "";
 	OnlineStatus onlineStatus;
-	DBHandler dbhandler;
+	public boolean isInitialized = false;
 	String user = "";
 	String password = "";
 	String strresponse = "";
@@ -43,6 +43,7 @@ public class Server {
 		this.address = address;
 		this.user = user;
 		this.password = password;
+		this.isInitialized=true;
 		onlineStatus = new OnlineStatus();
 		if (ping() == true) {
 			onlineStatus.setStatusAsPingAble();
@@ -50,6 +51,10 @@ public class Server {
 			onlineStatus.setStatusAsOffline();
 		}
 
+	}
+
+	public Server(){
+		this.isInitialized=false;
 	}
 
 	public interface ConnectListener {
