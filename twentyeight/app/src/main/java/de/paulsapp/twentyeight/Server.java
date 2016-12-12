@@ -425,13 +425,14 @@ public class Server {
 		}
 	}
 
-	public void loadCredentials(Database db, Activity activity, Context context) {
+	public boolean loadCredentials(Database db, Activity activity, Context context) {
 		this.db=db;
 		Cursor crs = db.getRawQuery("SELECT url,user,password FROM savedUsers WHERE selected = 1");
 		if (crs.getCount() <= 0) {
 			Intent loginActivityIntent = new Intent(activity, LoginActivity.class);
 			activity.startActivity(loginActivityIntent);
 			activity.finish();
+			return false;
 		} else {
 			try {
 				address = crs.getString(crs
@@ -441,11 +442,13 @@ public class Server {
 				password = crs.getString(crs
 						.getColumnIndex("password"));
 				this.context=context;
+				crs.close();
+				return true;
 			} catch (Exception e) {
 				Log.e("Server","could not load credentials");
 			}
 			crs.close();
-
+			return false;
 
 		}
 	}

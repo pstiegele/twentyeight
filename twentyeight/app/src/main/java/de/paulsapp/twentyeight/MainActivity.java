@@ -125,7 +125,9 @@ public class MainActivity extends Activity {
         /// and init Server  ///
         ////////////////////////
         server=new Server();
-        server.loadCredentials(db,this,context);
+        if(!server.loadCredentials(db,this,context)){
+            return;
+        }
 
         ////////////////////////
         ///   init TempChart ///
@@ -244,7 +246,7 @@ public class MainActivity extends Activity {
     }
 
     public void updateDosenStatus() {
-        if (server != null) {
+        if (server.isInitialized) {
            drawer.updateDose();
         }
 

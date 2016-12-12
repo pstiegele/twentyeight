@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Mon Dec 12 21:48:48 CET 2016
+#Mon Dec 12 22:33:30 CET 2016
 175.set=ANDROID_RESOURCE
 122.file=D\:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\resources-debug.ap_\\res\\layout\\notification_template_part_time.xml
 60.set=ANDROID_RESOURCE

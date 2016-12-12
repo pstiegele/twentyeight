@@ -28,15 +28,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * Created by pstiegele on 12.12.2016.
+ * Created by Paul Stiegele on 12.12.2016. Hell yeah!
  */
 
 public class Drawer {
     private Context context;
     private String[] mDrawerItemsTitles;
     private int[] mDrawerItemsIcons = {R.drawable.schreibtischlampe, R.drawable.fernseher, R.drawable.bluetoothspeaker, R.drawable.lightstripe};
-    public DrawerLayout mDrawerLayout;
-    public RecyclerView mDrawerRecyclerView;
+    private DrawerLayout mDrawerLayout;
+    private RecyclerView mDrawerRecyclerView;
     public RecyclerView.Adapter mDrawerAdapter;
     public ActionBarDrawerToggle mDrawerToggle;
     public boolean[] mStatus;
@@ -264,6 +264,10 @@ public class Drawer {
                         //   int shortTimeLimit;
                         //   Date timeSetShort = null;
                         //  Date lastTimeSet = null;
+
+                        if(count!=mStatus.length){
+                            mStatus=new boolean[count];
+                        }
 
                         for (int i = 0; i < count; i++) {
                             JSONObject job = responseJSON.getJSONArray("content")
