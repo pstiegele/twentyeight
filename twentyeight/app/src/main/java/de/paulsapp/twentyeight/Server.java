@@ -17,12 +17,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 @SuppressWarnings("deprecation")
@@ -37,6 +40,23 @@ public class Server {
 	ConnectListener mConnectListener;
 	Context context;
 	SelectListener mSelectListener;
+	private Database db;
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
 	public Server(String address, String user, String password, Context context) {
 		this.context = context;
@@ -55,6 +75,8 @@ public class Server {
 
 	public Server(){
 		this.isInitialized=false;
+		onlineStatus = new OnlineStatus();
+		onlineStatus.setStatusAsOffline();
 	}
 
 	public interface ConnectListener {
@@ -400,6 +422,31 @@ public class Server {
 		protected void onPreExecute() {
 			// Things to be done before execution of long running operation. For
 			// example showing ProgessDialog
+		}
+	}
+
+	public void loadCredentials(Database db, Activity activity, Context context) {
+		this.db=db;
+		Cursor crs = db.getRawQuery("SELECT url,user,password FROM savedUsers WHERE selected = 1");
+		if (crs.getCount() <= 0) {
+			Intent loginActivityIntent = new Intent(activity, LoginActivity.class);
+			activity.startActivity(loginActivityIntent);
+			activity.finish();
+		} else {
+			try {
+				address = crs.getString(crs
+						.getColumnIndex("url"));
+				user = crs.getString(crs
+						.getColumnIndex("user"));
+				password = crs.getString(crs
+						.getColumnIndex("password"));
+				this.context=context;
+			} catch (Exception e) {
+				Log.e("Server","could not load credentials");
+			}
+			crs.close();
+
+
 		}
 	}
 

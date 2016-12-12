@@ -124,7 +124,8 @@ public class MainActivity extends Activity {
         /// load Credentials ///
         /// and init Server  ///
         ////////////////////////
-        loadCredentials(true);
+        server=new Server();
+        server.loadCredentials(db,this,context);
 
         ////////////////////////
         ///   init TempChart ///
@@ -162,36 +163,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void loadCredentials(boolean initServer) {
-        String url = "";
-        String user = "";
-        String password = "";
-        Cursor crs = db.getRawQuery("SELECT url,user,password FROM savedUsers WHERE selected = 1");
 
-        if (crs.getCount() <= 0) {
-            Intent loginActivityIntent = new Intent(this, LoginActivity.class);
-            startActivity(loginActivityIntent);
-            finish();
-        } else {
-            try {
-                url = crs.getString(crs
-                        .getColumnIndex("url"));
-                user = crs.getString(crs
-                        .getColumnIndex("user"));
-                password = crs.getString(crs
-                        .getColumnIndex("password"));
-            } catch (Exception e) {
-                toast("Could not load credentials!");
-            }
-            crs.close();
-
-            if (initServer) {
-                initServer(url, user, password);
-
-
-            }
-        }
-    }
 
 
     public void setRefreshTime() {
