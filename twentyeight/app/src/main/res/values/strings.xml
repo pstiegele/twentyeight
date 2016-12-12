@@ -8,6 +8,7 @@
     <string name="login_activity">Zugangsdaten</string>
     <string name="export_db">DB exportieren</string>
     <string name="delete_db">DB löschen</string>
+    <string name="coldRefresh">Alles neu laden</string>
     <string name="refresh">Aktualisieren</string>
     <string name="openDrawer">Open</string>
     <string name="closeDrawer">Close</string>
@@ -33,9 +34,13 @@
         user TEXT,
         password TEXT,
         datetime DATETIME,
-        selected BIT
+        selected BIT,
+            name TEXT,
+            description TEXT,
+            permissionDose BIT
       )
 </item>
+
         <item>      create table sync(
         id integer primary key autoincrement,
         datetime DATETIME
@@ -54,5 +59,7 @@
 
 
     </string-array>
+    <string name="appwidget_text">28°</string>
+    <string name="add_widget">Add widget</string>
 
 </resources>

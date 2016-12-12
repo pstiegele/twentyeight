@@ -181,9 +181,12 @@ public class MainActivity extends Activity {
     }
 
     public void setDrawerPrefs(Bundle savedInstanceState) {
-        String NAME = "Paul Stiegele";
-        String EMAIL = "pstiegele@stiegele.name";
-        int PROFILEPICTURE = R.drawable.profilepicture;
+//        String NAME = "Paul Stiegele";
+//        String EMAIL = "paul@stiegele.name";
+//        int PROFILEPICTURE = R.drawable.profilepicture;
+        String NAME = "";
+        String EMAIL = "";
+        int PROFILEPICTURE = R.drawable.ic_account_circle_white_48dp;
         RecyclerView.LayoutManager mDrawerLayoutManager;
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.layout_root);
@@ -324,7 +327,10 @@ public class MainActivity extends Activity {
         }
 
         if (timediff / 1000 / 60 > 5) {
-            updateData(server);
+            if(server!=null){
+                updateData(server);
+            }
+
         }
     }
 
@@ -385,9 +391,12 @@ public class MainActivity extends Activity {
     }
 
     public void updateDosenStatus() {
-        AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
-        Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
-        runner.execute(sps);
+        if(server!=null){
+            AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
+            Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
+            runner.execute(sps);
+        }
+
     }
 
 
@@ -992,6 +1001,12 @@ public class MainActivity extends Activity {
             updateData(server);
 
         }
+        if (id == R.id.coldRefresh) {
+           //TODO: Kaltstart einfügen
+            AsyncGetAllElementsColdRefresh runner = new AsyncGetAllElementsColdRefresh();
+            runner.execute(server);
+
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -1270,4 +1285,131 @@ public class MainActivity extends Activity {
             // example showing ProgessDialog
         }
     }
+
+    //Allgemeine Infos Anfang
+    @SuppressWarnings("deprecation")
+    private class AsyncGetAllElementsColdRefresh extends AsyncTask<Server, String, Boolean> {
+        @Override
+        protected Boolean doInBackground(Server... params) {
+            Server server = params[0];
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(server.address);
+            JSONObject json = new JSONObject();
+            String strresponse;
+            boolean statusChanges = false;
+
+            try {
+                // JSON data:
+                json.put("type", "coldRefresh");
+                json.put("user", server.user);
+                json.put("password", server.password);
+
+                JSONArray postjson = new JSONArray();
+                postjson.put(json);
+
+                // Post the data:
+                httppost.setHeader("json", json.toString());
+                httppost.getParams().setParameter("jsonpost", postjson);
+
+                // Execute HTTP Post Request
+
+                HttpResponse response = httpclient.execute(httppost);
+
+                // for JSON:
+                if (response != null) {
+                    InputStream is = response.getEntity().getContent();
+
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(is));
+                    StringBuilder sb = new StringBuilder();
+
+                    String line;
+                    try {
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line).append("\n");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    strresponse = sb.toString();
+                    JSONObject responseJSON = new JSONObject(strresponse);
+                    if (responseJSON.getString("credentials").equals("true")) {
+
+                        // in lokale DB schreiben
+
+                        int count = responseJSON.getInt("countDose");
+                        String name;
+                        DoseStatus status;
+                        //    String icon;
+                        //   int shortTimeLimit;
+                        //   Date timeSetShort = null;
+                        //  Date lastTimeSet = null;
+
+                        for (int i = 0; i < count; i++) {
+                            JSONObject job = responseJSON.getJSONArray("Dose")
+                                    .getJSONObject(i);
+                            name = job.getString("name");
+                            if (job.getInt("status") == 0) {
+                                status = DoseStatus.AUS;
+                            } else {
+                                status = DoseStatus.AN;
+                            }
+
+                            openDB(context);
+                            String sqlstring = "INSERT INTO doseElements (name,status) VALUES ('"
+                                    + name
+                                    + "','"
+                                    + status.getAsInt()
+                                    + "')";
+                            Cursor cr = connection.rawQuery(
+                                    "SELECT name FROM doseElements WHERE name = '" + name + "'",
+                                    null);
+                            if (cr.getCount() == 0) {
+                                connection.execSQL(sqlstring);
+                            } else {
+                                connection.execSQL("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
+                            }
+                            cr.close();
+                            if (mStatus.length >= i) {
+                                mStatus[i] = status.getAsBoolean();
+                                statusChanges = true;
+                            }
+
+
+                        }
+
+                        //TODO: Name, permission, description
+
+                        closeDB();
+
+                    }
+
+                }
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+            return statusChanges;
+        }
+
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                mDrawerAdapter.notifyDataSetChanged();
+            }
+
+
+        }
+
+        protected void onPreExecute() {
+            // Things to be done before execution of long running operation. For
+            // example showing ProgessDialog
+        }
+    }
+    //Allgemeine Infos Ende
 }

@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -188,7 +191,11 @@ public class Server {
 		Cursor cur = connection.rawQuery(
 				"SELECT MAX(datetime) FROM temperature", null);
 		cur.moveToFirst();
-		String lastDateTime = "1970-01-01 00:00:00";
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.add(GregorianCalendar.DAY_OF_MONTH,-8);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String lastDateTime = simpleDateFormat.format(cal.getTime());
+		Log.d("Server","postSelectData: lastDateTime="+lastDateTime);
 		if (cur.getCount() > 0) {
 			lastDateTime = cur.getString(0);
 		}
@@ -309,6 +316,7 @@ public class Server {
 	private class AsyncTaskRunner extends AsyncTask<String, String, Object[]> {
 		@Override
 		protected Object[] doInBackground(String... params) {
+
 
 			Object ret[] = new Object[5]; // ret[0]=Art der Anfrage
 											// ret[1]=Anfrage fehlgeschlagen /

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<instant-run
+    abi="arm64-v8a,armeabi-v7a,armeabi"
+    api-level="23"
+    density="xxxhdpi"
+    format="8"
+    plugin-version="2.2.3"
+    timestamp="424559715062494"
+    token="-6785846879691722263"
+    verifier="COMPATIBLE" >
+
+    <task
+        name="javac"
+        duration="736" />
+    <task
+        name="instant-run-dex"
+        duration="812" />
+    <task
+        name="instant-run-transform"
+        duration="56" />
+    <task
+        name="verifier"
+        duration="13" />
+
+    <artifact
+        location="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\reload-dex\debug\classes.dex"
+        type="RELOAD_DEX" />
+
+    <build
+        timestamp="424191252859133"
+        verifier="FULL_BUILD_REQUESTED" >
+        <artifact
+            location="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\outputs\apk\app-debug.apk"
+            type="MAIN" />
+    </build>
+    <build
+        timestamp="424471944860949"
+        verifier="COMPATIBLE" >
+        <artifact
+            location="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\builds\debug\424471944860949\classes.dex"
+            type="RELOAD_DEX" />
+    </build>
+    <build
+        timestamp="424559715062494"
+        verifier="COMPATIBLE" >
+        <artifact
+            location="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\reload-dex\debug\classes.dex"
+            type="RELOAD_DEX" />
+    </build>
+
+</instant-run>

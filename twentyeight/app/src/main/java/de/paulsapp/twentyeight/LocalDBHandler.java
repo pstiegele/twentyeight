@@ -8,7 +8,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
 	
 	private Context context;
 	
-	LocalDBHandler(Context context){
+	public LocalDBHandler(Context context){
 	    super(
 	        context,
 	        context.getResources().getString(R.string.dbname),
