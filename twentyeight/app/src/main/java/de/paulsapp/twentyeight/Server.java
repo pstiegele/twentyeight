@@ -453,4 +453,133 @@ public class Server {
 		}
 	}
 
+	//Allgemeine Infos Anfang
+	@SuppressWarnings("deprecation")
+	public class AsyncGetAllElementsColdRefresh extends AsyncTask<Drawer, String, Boolean> {
+		@Override
+		protected Boolean doInBackground(Drawer... params) {
+			Drawer drawer = params[0];
+			// Create a new HttpClient and Post Header
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost(address);
+			JSONObject json = new JSONObject();
+			String strresponse;
+			boolean statusChanges = false;
+
+			try {
+				// JSON data:
+				json.put("type", "coldRefresh");
+				json.put("user", user);
+				json.put("password", password);
+
+				JSONArray postjson = new JSONArray();
+				postjson.put(json);
+
+				// Post the data:
+				httppost.setHeader("json", json.toString());
+				httppost.getParams().setParameter("jsonpost", postjson);
+
+				// Execute HTTP Post Request
+
+				HttpResponse response = httpclient.execute(httppost);
+
+				// for JSON:
+				if (response != null) {
+					InputStream is = response.getEntity().getContent();
+
+					BufferedReader reader = new BufferedReader(
+							new InputStreamReader(is));
+					StringBuilder sb = new StringBuilder();
+
+					String line;
+					try {
+						while ((line = reader.readLine()) != null) {
+							sb.append(line).append("\n");
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						try {
+							is.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					strresponse = sb.toString();
+					JSONObject responseJSON = new JSONObject(strresponse);
+					if (responseJSON.getString("credentials").equals("true")) {
+
+						// in lokale DB schreiben
+
+						int count = responseJSON.getInt("countDose");
+						String name;
+						DoseStatus status;
+						//    String icon;
+						//   int shortTimeLimit;
+						//   Date timeSetShort = null;
+						//  Date lastTimeSet = null;
+
+						for (int i = 0; i < count; i++) {
+							JSONObject job = responseJSON.getJSONArray("Dose")
+									.getJSONObject(i);
+							name = job.getString("name");
+							if (job.getInt("status") == 0) {
+								status = DoseStatus.AUS;
+							} else {
+								status = DoseStatus.AN;
+							}
+
+							String sqlstring = "INSERT INTO doseElements (name,status) VALUES ('"
+									+ name
+									+ "','"
+									+ status.getAsInt()
+									+ "')";
+							Cursor cr = db.getRawQuery(
+									"SELECT name FROM doseElements WHERE name = '" + name + "'");
+							if (cr.getCount() == 0) {
+								db.execSQLString(sqlstring);
+							} else {
+								db.execSQLString("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
+							}
+							cr.close();
+							if (drawer.mStatus.length >= i) {
+								drawer.mStatus[i] = status.getAsBoolean();
+								statusChanges = true;
+							}
+
+
+						}
+
+						//TODO: Name, permission, description
+
+
+
+					}
+
+				}
+			} catch (JSONException | IOException e) {
+				e.printStackTrace();
+			}
+			if(statusChanges){
+				drawer.mDrawerAdapter.notifyDataSetChanged();
+			}
+			return statusChanges;
+		}
+
+		protected void onPostExecute(Boolean result) {
+
+		}
+
+		protected void onPreExecute() {
+			// Things to be done before execution of long running operation. For
+			// example showing ProgessDialog
+		}
+	}
+
+	public void doColdRefresh(Drawer drawer){
+		AsyncGetAllElementsColdRefresh runner = new AsyncGetAllElementsColdRefresh();
+		runner.execute(drawer);
+
+	}
+
 }

@@ -4,6 +4,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 /**
  * Created by pstiegele on 12.12.2016.
@@ -50,5 +58,36 @@ public class Database {
         }
         connection.execSQL(sqlstring);
         closeDB();
+    }
+
+    @SuppressWarnings("resource")
+    public void exportDB() {
+        File sd = Environment.getExternalStorageDirectory();
+        File data = Environment.getDataDirectory();
+        FileChannel source;
+        FileChannel destination;
+        String dbname = context.getResources().getString(R.string.dbname);
+        String currentDBPath = "/data/" + "de.paulsapp.twentyeight"
+                + "/databases/" + dbname;
+        File currentDB = new File(data, currentDBPath);
+        File backupDB = new File(sd, dbname);
+        try {
+            source = new FileInputStream(currentDB).getChannel();
+            destination = new FileOutputStream(backupDB).getChannel();
+            destination.transferFrom(source, 0, source.size());
+            source.close();
+            destination.close();
+            Toast.makeText(context, "DB Exported!", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteDB() {
+        String dbname = context.getResources().getString(R.string.dbname);
+        boolean result = context.deleteDatabase(dbname);
+        if (result) {
+            Toast.makeText(context, "DB Deleted!", Toast.LENGTH_LONG).show();
+        }
     }
 }

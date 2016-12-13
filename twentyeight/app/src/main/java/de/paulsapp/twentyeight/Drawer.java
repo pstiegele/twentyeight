@@ -31,7 +31,8 @@ import java.io.InputStreamReader;
  * Created by Paul Stiegele on 12.12.2016. Hell yeah!
  */
 
-public class Drawer {
+public class Drawer{
+    private Server server;
     private Context context;
     private String[] mDrawerItemsTitles;
     private int[] mDrawerItemsIcons = {R.drawable.schreibtischlampe, R.drawable.fernseher, R.drawable.bluetoothspeaker, R.drawable.lightstripe};
@@ -42,10 +43,11 @@ public class Drawer {
     public boolean[] mStatus;
     private Database db;
     private Activity activity;
-    public Drawer(Context context, Activity activity){
+    public Drawer(Context context, Database db, Server server, Activity activity){
         this.context=context;
+        this.db =db;
+        this.server = server;
         this.activity = activity;
-        this.db =MainActivity.db;
     }
 
 
@@ -126,7 +128,7 @@ public class Drawer {
                         newStatus = 1;
                         mStatus[recyclerView.getChildPosition(child) - 1] = true;
                     }
-                    Dosen.SammelParamsStatic sp = new Dosen.SammelParamsStatic(mDrawerItemsTitles[recyclerView.getChildPosition(child) - 1], String.valueOf(newStatus), MainActivity.server);
+                    Dosen.SammelParamsStatic sp = new Dosen.SammelParamsStatic(mDrawerItemsTitles[recyclerView.getChildPosition(child) - 1], String.valueOf(newStatus), server);
                     mDrawerAdapter.notifyDataSetChanged();
                     runner.execute(sp);
                     db.execSQLString("UPDATE \"doseElements\" SET \"status\"='" + newStatus + "' WHERE \"id\" = " + recyclerView.getChildPosition(child));
@@ -325,10 +327,17 @@ public class Drawer {
         }
     }
 
-    public void updateDose(){
+    private void updateDose(){
         AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
-        Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(MainActivity.server);
+        Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
         runner.execute(sps);
+    }
+
+    public void updateDosenStatus() {
+        if (server!=null&&server.isInitialized==true) {
+            updateDose();
+        }
+
     }
 
 }
