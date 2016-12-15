@@ -1,3 +1,9 @@
-twentyeight/app/build/intermediates/*
-twentyeight/.gradle/*
-twentyeight/.idea/*
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
+.externalNativeBuild
