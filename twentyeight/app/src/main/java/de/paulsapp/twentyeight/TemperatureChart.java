@@ -155,6 +155,7 @@ public class TemperatureChart {
         set1.setColor(activity.getSharedPreferences("myprefs", 0).getInt(
                 "trendcurveColorAussen", Color.WHITE));
         set1.setFillColor(ColorTemplate.getHoloBlue());
+        set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
         Object[] result = new Object[2];
         result[0]=set1;
@@ -190,6 +191,7 @@ public class TemperatureChart {
         set2.setColor(activity.getSharedPreferences("myprefs", 0).getInt(
                 "trendcurveColorInnen", Color.GRAY));
         set2.setFillColor(ColorTemplate.getHoloBlue());
+        set2.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
         return set2;
     }
@@ -212,6 +214,7 @@ public class TemperatureChart {
         chart.setDoubleTapToZoomEnabled(false);
         chart.setScaleYEnabled(false);
         chart.setScaleXEnabled(true);
+        chart.setExtraTopOffset(5f);
         //chart.setHighlightEnabled(false);
 
         chart.getXAxis().setDrawAxisLine(false);
@@ -266,7 +269,7 @@ public class TemperatureChart {
             }
         };
 
-        //chart.getXAxis().setValueFormatter(formatter);
+        chart.getXAxis().setValueFormatter(formatter);
 
         LineData data = new LineData(dataSets);
         data.setValueTextColor(activity.getSharedPreferences("myprefs", 0).getInt(
