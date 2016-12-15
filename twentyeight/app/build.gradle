@@ -27,6 +27,8 @@ dependencies {
     compile 'com.android.support:support-v4:22.2.1'
     compile 'de.hdodenhof:circleimageview:1.2.1'
     compile 'com.android.support:recyclerview-v7:21.0.+'
-    compile files('libs/mpandroidchartlibrary-2-1-0.jar')
+ //   compile files('libs/mpandroidchartlibrary-2-1-0.jar')
     compile files('libs/volley.jar')
+
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
 }

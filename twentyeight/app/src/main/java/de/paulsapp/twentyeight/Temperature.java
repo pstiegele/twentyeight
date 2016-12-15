@@ -6,10 +6,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v4.content.res.ResourcesCompat;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 
 public class Temperature{
 
@@ -155,4 +163,73 @@ public class Temperature{
 			refreshbgcolor(rl_color, false);
 		}
 	}
+	private void initColors(){
+		initBackgroundColor();
+		initTextColors();
+		initImageColors();
+		initLineChartColors();
+	}
+
+	private void initTextColors(){
+		final TextView tv_aussen = (TextView) activity.findViewById(R.id.temperature_now_outside);
+		final TextView tv_innen = (TextView) activity.findViewById(R.id.temperature_now_inside);
+		final TextView tv_refresh = (TextView) activity.findViewById(R.id.lastrefresh_tv);
+
+		SharedPreferences colorSettings = activity.getSharedPreferences("myprefs", 0);
+		tv_aussen.setTextColor(colorSettings.getInt("tv_colorAussen",
+				Color.WHITE));
+		tv_innen.setTextColor(colorSettings
+				.getInt("tv_colorInnen", Color.WHITE));
+
+		tv_aussen.setText(activity.getString(R.string.CHART_DEGREE, getnewesttempentry(1)).replace(",", "."));
+		tv_innen.setText(activity.getString(R.string.CHART_DEGREE, getnewesttempentry(2)).replace(",", "."));
+		tv_refresh.setTextColor(colorSettings.getInt("refreshColor",
+				Color.WHITE));
+	}
+
+	private void initImageColors(){
+		final ImageView sanduhr = (ImageView) activity.findViewById(R.id.lastrefresh_iv);
+		final ImageView house = (ImageView) activity.findViewById(R.id.house_image);
+
+		SharedPreferences colorSettings = activity.getSharedPreferences("myprefs", 0);
+		if (colorSettings.getInt("sanduhrColor", Color.WHITE) == Color.WHITE) {
+			sanduhr.setImageDrawable(ResourcesCompat.getDrawable(
+					activity.getResources(),R.drawable.sanduhr,null));
+		} else {
+			sanduhr.getDrawable().setColorFilter(Color.DKGRAY,
+					PorterDuff.Mode.MULTIPLY);
+		}
+
+		house.getDrawable().setColorFilter(
+				colorSettings.getInt("houseColor", Color.GRAY),
+				PorterDuff.Mode.MULTIPLY);
+
+
+	}
+
+	private void initLineChartColors(){
+		final LineChart chart = (LineChart) activity.findViewById(R.id.chart);
+		final XAxis xaxis = chart.getXAxis();
+		final YAxis axisLeft = chart.getAxisLeft();
+
+		SharedPreferences colorSettings = activity.getSharedPreferences("myprefs", 0);
+		xaxis.setTextColor(colorSettings.getInt("chartColor", Color.WHITE));
+		axisLeft.setTextColor(colorSettings.getInt("chartColor", Color.WHITE));
+	}
+
+	public void initTemperature(){
+		initColors();
+		saveTemperatureAsInitalTemperature();
+	}
+
+	private void saveTemperatureAsInitalTemperature(){
+		SharedPreferences settings = activity.getSharedPreferences("temp", 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putFloat("temp_aussen_start",
+				(float) (Math.round(getnewesttempentry(1) * 10) / 10.0));
+		editor.putFloat("temp_innen_start",
+				(float) (Math.round(getnewesttempentry(2) * 10) / 10.0));
+		editor.apply();
+	}
+
 }

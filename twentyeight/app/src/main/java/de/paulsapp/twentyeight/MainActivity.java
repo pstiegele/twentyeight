@@ -56,6 +56,15 @@ public class MainActivity extends Activity {
         ////////////////////////
         db = new Database(context);
 
+        ////////////////////////
+        /// load Credentials ///
+        /// and init Server  ///
+        ////////////////////////
+        server = new Server();
+        if (!server.loadCredentials(db, this, context)) {
+            return;
+        }
+
         /////////////////
         //// Drawer /////
         /////////////////
@@ -68,25 +77,15 @@ public class MainActivity extends Activity {
         /// Background Color ///
         ////////////////////////
         temperature = new Temperature(context,this);
-        temperature.initBackgroundColor();
+        temperatureChart = new TemperatureChart(temperature, db,this);
+        temperature.initTemperature();
 
-
-        ////////////////////////
-        /// load Credentials ///
-        /// and init Server  ///
-        ////////////////////////
-        server = new Server();
-        if (!server.loadCredentials(db, this, context)) {
-            return;
-        }
 
         ////////////////////////
         ///   init TempChart ///
         ////////////////////////
+        temperatureChart.refreshTempCharts();
 
-        temperatureChart = new TemperatureChart(temperature, db,this);
-        temperatureChart.setInitalTempCharts();
-        temperatureChart.setTempChart();
 
 
         /////////////////////////

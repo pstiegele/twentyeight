@@ -1,4 +1,4 @@
-#Tue Dec 13 15:59:36 CET 2016
+#Thu Dec 15 23:43:40 CET 2016
 base.0=D\:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_ef54e06b3ccdbec6d22a6089dd4bfc7d99c298bd
 renamed.1=classes2.dex
 renamed.0=classes.dex

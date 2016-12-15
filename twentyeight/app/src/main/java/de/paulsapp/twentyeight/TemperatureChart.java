@@ -11,23 +11,31 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Handler;
-import android.support.v4.content.res.ResourcesCompat;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,158 +44,74 @@ import java.util.TimerTask;
  * Created by pstiegele on 13.12.2016. Hell yeah!
  */
 
-public class TemperatureChart{
+public class TemperatureChart {
 
 
     private Temperature temperature;
     private Database db;
     private Activity activity;
-    private Handler handler = new Handler();
     final Runnable Runnable_Chart = new Runnable() {
         public void run() {
             final LineChart chart = (LineChart) activity.findViewById(R.id.chart);
             chart.invalidate();
         }
     };
+    private boolean isInitalized = false;
+    private Handler handler = new Handler();
 
-    public TemperatureChart(Temperature temperature, Database db, Activity activity){
-        this.temperature=temperature;
-        this.db=db;
-        this.activity=activity;
+    public TemperatureChart(Temperature temperature, Database db, Activity activity) {
+        this.temperature = temperature;
+        this.db = db;
+        this.activity = activity;
     }
 
-    public void setInitalTempCharts() {
-        final TextView tv_aussen = (TextView) activity.findViewById(R.id.temperature_now_outside);
-        final TextView tv_innen = (TextView) activity.findViewById(R.id.temperature_now_inside);
-        final TextView tv_refresh = (TextView) activity.findViewById(R.id.lastrefresh_tv);
-        final LineChart chart = (LineChart) activity.findViewById(R.id.chart);
-        final XAxis xaxis = chart.getXAxis();
-        final YAxis axisLeft = chart.getAxisLeft();
-        final ImageView sanduhr = (ImageView) activity.findViewById(R.id.lastrefresh_iv);
-        final ImageView house = (ImageView) activity.findViewById(R.id.house_image);
-
-        SharedPreferences colorSettings = activity.getSharedPreferences("myprefs", 0);
-
-        tv_aussen.setTextColor(colorSettings.getInt("tv_colorAussen",
-                Color.WHITE));
-        tv_innen.setTextColor(colorSettings
-                .getInt("tv_colorInnen", Color.WHITE));
-
-        // tv_aussen.setText(Math.round(getnewesttempentry(1) * 10) / 10.0 + "°");
-        // tv_innen.setText(Math.round(getnewesttempentry(2) * 10) / 10.0 + "°");
-
-
-        tv_aussen.setText(activity.getString(R.string.CHART_DEGREE, temperature.getnewesttempentry(1)).replace(",", "."));
-        tv_innen.setText(activity.getString(R.string.CHART_DEGREE, temperature.getnewesttempentry(2)).replace(",", "."));
-
-
-        tv_refresh.setTextColor(colorSettings.getInt("refreshColor",
-                Color.WHITE));
-
-        xaxis.setTextColor(colorSettings.getInt("chartColor", Color.WHITE));
-        axisLeft.setTextColor(colorSettings.getInt("chartColor", Color.WHITE));
-
-        if (colorSettings.getInt("sanduhrColor", Color.WHITE) == Color.WHITE) {
-            sanduhr.setImageDrawable(ResourcesCompat.getDrawable(
-                    activity.getResources(),R.drawable.sanduhr,null));
-        } else {
-            sanduhr.getDrawable().setColorFilter(Color.DKGRAY,
-                    PorterDuff.Mode.MULTIPLY);
+    public void refreshTempCharts() {
+        if (!isInitalized) {
+            initalizeTempChart();
         }
-
-        house.getDrawable().setColorFilter(
-                colorSettings.getInt("houseColor", Color.GRAY),
-                PorterDuff.Mode.MULTIPLY);
-
-        SharedPreferences settings = activity.getSharedPreferences("temp", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putFloat("temp_aussen_start",
-                (float) (Math.round(temperature.getnewesttempentry(1) * 10) / 10.0));
-        editor.putFloat("temp_innen_start",
-                (float) (Math.round(temperature.getnewesttempentry(2) * 10) / 10.0));
-        editor.apply();
-    }
-
-    public void setTempChart() {
-        // unteres Chart
+        Object[] aussen = importTempChartAussen(); //in aussen[0] ist das LineDataSet gespeichert, in aussen[1] die xValues
+        LineDataSet innen = importTemperatureInnen();
+        setLineDatasInChart((LineDataSet)aussen[0],innen,(ArrayList<String>) aussen[1]);
         LineChart chart = (LineChart) activity.findViewById(R.id.chart);
-
-        chart.setLogEnabled(false);
-        chart.setDescription("");
-        chart.setNoDataText("Keine Daten verfügbar");
-        chart.setTouchEnabled(true);
-        chart.setPinchZoom(false);
-        chart.setDrawGridBackground(false);
-        chart.setDrawBorders(false);
-        chart.setMaxVisibleValueCount(10);
-        chart.setDoubleTapToZoomEnabled(false);
-        chart.setScaleYEnabled(false);
-        chart.setScaleXEnabled(true);
-        chart.setHighlightEnabled(false);
-
-        chart.getXAxis().setDrawAxisLine(false);
-        chart.getXAxis().setEnabled(true);
-        chart.getXAxis().setDrawGridLines(false);
-        chart.getXAxis().setTypeface(
-                Typeface.create("sans-serif-light", Typeface.NORMAL));
-        chart.getXAxis().setTextSize(13f);
-
-        chart.getAxisLeft().setDrawAxisLine(false);
-        chart.getAxisLeft().setDrawGridLines(false);
-        chart.getAxisLeft().setEnabled(true);
-        chart.getAxisLeft().setValueFormatter(new MyValueFormatter());
-        chart.getAxisLeft().setTypeface(
-                Typeface.create("sans-serif-light", Typeface.NORMAL));
-        chart.getAxisLeft().setTextSize(13f);
-
-        chart.getAxisRight().setDrawAxisLine(false);
-        chart.getAxisRight().setDrawGridLines(false);
-        chart.getAxisRight().setEnabled(false);
-
-        Legend legend = chart.getLegend();
-        legend.setEnabled(false);
-
-        setChartData1(chart);
         chart.animateY(1500);
 
     }
 
-    private void setChartData1(LineChart chart) {
-        // TEMP AUSSEN ANFANG
-        ArrayList<String> xValues1 = new ArrayList<>();
-        ArrayList<Entry> values1 = new ArrayList<>();
+    private Object[] importTempChartAussen() {
+        //setChartData1(chart);
+        //chart.animateY(1500);
+
+        //xValues: beinhaltet die Beschriftungen der X-Skalierung
+        ArrayList<String> xValues = new ArrayList<>();
+        //values: beinhaltet die x und y Werte als Entry
+        ArrayList<Entry> values = new ArrayList<>();
+
         SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd' '00:00:00",
                 Locale.GERMANY);
         Date d = new Date();
-        d.setTime(d.getTime() - 604800000);
+        d.setTime(d.getTime() - 604800000); //604800000ms=7d
         GregorianCalendar datenow = new GregorianCalendar();
-        // String query =
-        // "SELECT datetime, Max(value) AS value FROM temperature where sensorid=1 GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime";
+
+        //ermittle die maximal Werte der letzten 7 Tage
         String query = "SELECT datetime, Max(value) AS value FROM temperature where sensorid=1 AND datetime> '"
                 + parser.format(d)
                 + "' GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime";
         Cursor cr1 = db.getRawQuery(query);
-        int year;
-        int month;
-        int day;
-        int hour;
-        int minute;
-        int second;
-        String date;
-        String day_of_week;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.GERMANY);
-        for (int i = 0; i < cr1.getCount(); i++) {
-            // Datetime
-            date = cr1.getString(cr1.getColumnIndex("datetime"));
-            year = Integer.parseInt(date.substring(0, 4));
-            month = Integer.parseInt(date.substring(5, 7)) - 1;
-            day = Integer.parseInt(date.substring(8, 10));
-            hour = Integer.parseInt(date.substring(11, 13));
-            minute = Integer.parseInt(date.substring(14, 16));
-            second = Integer.parseInt(date.substring(17, 19));
-            GregorianCalendar g = new GregorianCalendar(year, month, day, hour,
-                    minute, second);
 
+        Date date = null;
+        String day_of_week;
+        SimpleDateFormat sdfDayMonth = new SimpleDateFormat("dd.MM", Locale.GERMANY);
+        SimpleDateFormat sdfYearMonthDateHourMinuteSecond = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
+        for (int i = 0; i < cr1.getCount(); i++) {
+            //lese jeden Temperaturwert als Date ein und konvertiers dann zu einem GregorianCalendar
+
+            try {
+                date = sdfYearMonthDateHourMinuteSecond.parse(cr1.getString(cr1.getColumnIndex("datetime")));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            GregorianCalendar g = new GregorianCalendar();
+            g.setTime(date);
 
             if (datenow.get(GregorianCalendar.YEAR) == g
                     .get(GregorianCalendar.YEAR)
@@ -206,21 +130,22 @@ public class TemperatureChart{
                     && datenow.get(GregorianCalendar.DAY_OF_YEAR) - 8 >= g
                     .get(GregorianCalendar.DAY_OF_YEAR)) {
 
-                day_of_week = sdf.format(g.getTime());
+                day_of_week = sdfDayMonth.format(g.getTime());
 
             } else {
                 day_of_week = g.getDisplayName(GregorianCalendar.DAY_OF_WEEK,
                         GregorianCalendar.SHORT, Locale.GERMANY);
             }
-
-            xValues1.add(day_of_week);
-            values1.add(new Entry(cr1.getFloat(cr1.getColumnIndex("value")), i));
+            xValues.add(day_of_week);
+            values.add(new Entry(i,cr1.getFloat(cr1.getColumnIndex("value"))));
             cr1.moveToNext();
         }
         cr1.close();
 
-        LineDataSet set1 = new LineDataSet(values1, "Aussen");
-        set1.setDrawCubic(true);
+
+        //erstellt ein LineDataSet mit den Objekten und entsprechenden Anpassungen
+        LineDataSet set1 = new LineDataSet(values, "Aussen");
+        // set1.setDrawCubic(true);
         set1.setCubicIntensity(0.2f);
         set1.setDrawCircles(false);
         set1.setLineWidth(2f);
@@ -231,28 +156,31 @@ public class TemperatureChart{
                 "trendcurveColorAussen", Color.WHITE));
         set1.setFillColor(ColorTemplate.getHoloBlue());
 
-        // TEMP AUSSEN ENDE
-        // TEMP INNEN ANFANG
-        //ArrayList<String> xValues2 = new ArrayList<>();
-        ArrayList<Entry> values2 = new ArrayList<>();
+        Object[] result = new Object[2];
+        result[0]=set1;
+        result[1]=xValues;
+        return result;
+    }
+
+    private LineDataSet importTemperatureInnen() {
+
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd' '00:00:00",
+                Locale.GERMANY);
+        Date d = new Date();
+        d.setTime(d.getTime() - 604800000); //604800000ms=7d
+        ArrayList<Entry> values = new ArrayList<>();
         String query2 = "SELECT datetime, Max(value) AS value FROM temperature where sensorid=2 AND datetime> '"
                 + parser.format(d)
                 + "' GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime";
-        Cursor cr2 = db.getRawQuery(query2);
-        //  date = "";
-        for (int i = 0; i < cr2.getCount(); i++) {
-            // Datetime
-            //       date = cr2.getString(cr2.getColumnIndex("datetime"));
-            //      date = date.substring(8, 10) + "." + date.substring(5, 7) + "."
-            //               + date.substring(0, 4);
-            //  xValues2.add(date);
-            values2.add(new Entry(cr2.getFloat(cr2.getColumnIndex("value")), i));
-            cr2.moveToNext();
+        Cursor cr = db.getRawQuery(query2);
+        for (int i = 0; i < cr.getCount(); i++) {
+            values.add(new Entry(i,cr.getFloat(cr.getColumnIndex("value"))));
+            cr.moveToNext();
         }
-        cr2.close();
+        cr.close();
 
-        LineDataSet set2 = new LineDataSet(values2, "Innen");
-        set2.setDrawCubic(true);
+        LineDataSet set2 = new LineDataSet(values, "Innen");
+        //  set2.setDrawCubic(true);
         set2.setCubicIntensity(0.2f);
         set2.setDrawCircles(false);
         set2.setLineWidth(2f);
@@ -262,16 +190,88 @@ public class TemperatureChart{
         set2.setColor(activity.getSharedPreferences("myprefs", 0).getInt(
                 "trendcurveColorInnen", Color.GRAY));
         set2.setFillColor(ColorTemplate.getHoloBlue());
-        // TEMP INNEN ENDE
 
-        ArrayList<LineDataSet> dataSets = new ArrayList<>();
+        return set2;
+    }
+
+
+    private void initalizeTempChart() {
+
+        LineChart chart = (LineChart) activity.findViewById(R.id.chart);
+
+        chart.setLogEnabled(false);
+        Description description = new Description();
+        description.setText("");
+        chart.setDescription(description);
+        chart.setNoDataText("Keine Daten verfügbar");
+        chart.setTouchEnabled(true);
+        chart.setPinchZoom(false);
+        chart.setDrawGridBackground(false);
+        chart.setDrawBorders(false);
+        chart.setMaxVisibleValueCount(10);
+        chart.setDoubleTapToZoomEnabled(false);
+        chart.setScaleYEnabled(false);
+        chart.setScaleXEnabled(true);
+        //chart.setHighlightEnabled(false);
+
+        chart.getXAxis().setDrawAxisLine(false);
+        chart.getXAxis().setEnabled(true);
+        chart.getXAxis().setDrawGridLines(false);
+        chart.getXAxis().setTypeface(
+                Typeface.create("sans-serif-light", Typeface.NORMAL));
+        chart.getXAxis().setTextSize(13f);
+
+        chart.getAxisLeft().setDrawAxisLine(false);
+        chart.getAxisLeft().setDrawGridLines(false);
+        chart.getAxisLeft().setEnabled(true);
+        IAxisValueFormatter iAxisValueFormatter = new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                DecimalFormat mFormat = new DecimalFormat("###,###,##");
+                return mFormat.format(value) + "°";
+            }
+        };
+        chart.getAxisLeft().setValueFormatter(iAxisValueFormatter);
+        chart.getAxisLeft().setTypeface(
+                Typeface.create("sans-serif-light", Typeface.NORMAL));
+        chart.getAxisLeft().setTextSize(13f);
+
+        chart.getAxisRight().setDrawAxisLine(false);
+        chart.getAxisRight().setDrawGridLines(false);
+        chart.getAxisRight().setEnabled(false);
+
+        Legend legend = chart.getLegend();
+        legend.setEnabled(false);
+        isInitalized=true;
+    }
+
+
+    private void setLineDatasInChart(LineDataSet set1, LineDataSet set2, final ArrayList<String> xValues) {
+        LineChart chart = (LineChart) activity.findViewById(R.id.chart);
+        List<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(set1);
         dataSets.add(set2);
+        IValueFormatter iValueFormatter = new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                DecimalFormat mFormat = new DecimalFormat("###,###,##");
+                return mFormat.format(value) + "°";
+            }
+        };
 
-        LineData data = new LineData(xValues1, dataSets);
+        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return xValues.get((int)value);
+            }
+        };
+
+        //chart.getXAxis().setValueFormatter(formatter);
+
+        LineData data = new LineData(dataSets);
         data.setValueTextColor(activity.getSharedPreferences("myprefs", 0).getInt(
                 "chartValueColor", Color.BLACK));
-        data.setValueFormatter(new MyValueFormatter());
+        data.setValueFormatter(iValueFormatter);
         data.setValueTextSize(15f);
         data.setValueTypeface(Typeface.create("sans-serif-thin",
                 Typeface.NORMAL));
