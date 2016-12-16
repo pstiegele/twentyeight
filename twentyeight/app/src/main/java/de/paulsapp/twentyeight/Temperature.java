@@ -232,4 +232,6 @@ public class Temperature{
 		editor.apply();
 	}
 
+
+
 }

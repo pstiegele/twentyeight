@@ -27,6 +27,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
 public class Server {
@@ -579,6 +580,17 @@ public class Server {
 	public void doColdRefresh(Drawer drawer){
 		AsyncGetAllElementsColdRefresh runner = new AsyncGetAllElementsColdRefresh();
 		runner.execute(drawer);
+
+	}
+
+	public boolean nodata(){
+        String sqlString = "SELECT * FROM temperature";
+        Cursor cr = db.getRawQuery(sqlString);
+        if (cr.getCount()<=4){
+            return true;
+        }else{
+            return false;
+        }
 
 	}
 

@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+
 import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,14 +79,14 @@ public class MainActivity extends Activity {
         /// Background Color ///
         ////////////////////////
         temperature = new Temperature(context,this);
-        temperatureChart = new TemperatureChart(temperature, db,this);
+        temperatureChart = new TemperatureChart(temperature, db,this,server);
         temperature.initTemperature();
 
 
         ////////////////////////
         ///   init TempChart ///
         ////////////////////////
-        temperatureChart.refreshTempCharts();
+       temperatureChart.refreshTempCharts();
 
 
 
@@ -186,7 +188,9 @@ public class MainActivity extends Activity {
 
             @Override
             public void selectIsReady(boolean result) { // aktuelle Temp geladen
-
+                temperatureChart.refreshTempCharts();
+                LineChart chart = (LineChart) findViewById(R.id.chart);
+                chart.invalidate();
 
             }
         });

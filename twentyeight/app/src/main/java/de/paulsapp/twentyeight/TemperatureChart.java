@@ -50,6 +50,7 @@ public class TemperatureChart {
     private Temperature temperature;
     private Database db;
     private Activity activity;
+    private Server server;
     final Runnable Runnable_Chart = new Runnable() {
         public void run() {
             final LineChart chart = (LineChart) activity.findViewById(R.id.chart);
@@ -59,15 +60,19 @@ public class TemperatureChart {
     private boolean isInitalized = false;
     private Handler handler = new Handler();
 
-    public TemperatureChart(Temperature temperature, Database db, Activity activity) {
+    public TemperatureChart(Temperature temperature, Database db, Activity activity, Server server) {
         this.temperature = temperature;
         this.db = db;
         this.activity = activity;
+        this.server = server;
     }
 
     public void refreshTempCharts() {
         if (!isInitalized) {
             initalizeTempChart();
+        }
+        if(server.nodata()){
+            return;
         }
         Object[] aussen = importTempChartAussen(); //in aussen[0] ist das LineDataSet gespeichert, in aussen[1] die xValues
         LineDataSet innen = importTemperatureInnen();
@@ -149,7 +154,6 @@ public class TemperatureChart {
         set1.setCubicIntensity(0.2f);
         set1.setDrawCircles(false);
         set1.setLineWidth(2f);
-        set1.setCircleSize(2f);
         set1.setHighLightColor(Color.rgb(244, 117, 117));
         // set1.setColor(Color.rgb(104, 241, 175));
         set1.setColor(activity.getSharedPreferences("myprefs", 0).getInt(
@@ -207,13 +211,13 @@ public class TemperatureChart {
         chart.setDescription(description);
         chart.setNoDataText("Keine Daten verfügbar");
         chart.setTouchEnabled(true);
-        chart.setPinchZoom(false);
+        chart.setPinchZoom(true);
         chart.setDrawGridBackground(false);
         chart.setDrawBorders(false);
-        chart.setMaxVisibleValueCount(10);
-        chart.setDoubleTapToZoomEnabled(false);
+        chart.setMaxVisibleValueCount(14);
+        chart.setDoubleTapToZoomEnabled(true);
         chart.setScaleYEnabled(false);
-        chart.setScaleXEnabled(true);
+        chart.setScaleXEnabled(false);
         chart.setExtraTopOffset(5f);
         //chart.setHighlightEnabled(false);
 
@@ -284,6 +288,9 @@ public class TemperatureChart {
     }
 
     public void updateTempCharts() {
+        if(server.nodata()){
+            return;
+        }
         final TextView tv_aussen = (TextView) activity.findViewById(R.id.temperature_now_outside);
         final TextView tv_innen = (TextView) activity.findViewById(R.id.temperature_now_inside);
         final TextView tv_refresh = (TextView) activity.findViewById(R.id.lastrefresh_tv);
