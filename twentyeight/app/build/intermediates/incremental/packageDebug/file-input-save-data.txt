@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Fri Dec 16 13:05:36 CET 2016
+#Fri Dec 16 13:19:02 CET 2016
 122.file=D\:\\Workspace\\twentyeight\\twentyeight\\app\\build\\intermediates\\res\\resources-debug.ap_\\res\\drawable\\abc_item_background_holo_light.xml
 60.set=ANDROID_RESOURCE
 129.file=D\:\\Workspace\\twentyeight\\twentyeight\\app\\build\\intermediates\\res\\resources-debug.ap_\\res\\layout\\abc_list_menu_item_icon.xml

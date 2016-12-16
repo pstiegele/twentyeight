@@ -67,7 +67,7 @@ public class TemperatureChart {
         this.server = server;
     }
 
-    public void refreshTempCharts() {
+    public void refreshTempCharts(boolean animate) {
         if (!isInitalized) {
             initalizeTempChart();
         }
@@ -78,7 +78,10 @@ public class TemperatureChart {
         LineDataSet innen = importTemperatureInnen();
         setLineDatasInChart((LineDataSet)aussen[0],innen,(ArrayList<String>) aussen[1]);
         LineChart chart = (LineChart) activity.findViewById(R.id.chart);
-        chart.animateY(1500);
+        if(animate){
+            chart.animateY(1500);
+        }
+
 
     }
 

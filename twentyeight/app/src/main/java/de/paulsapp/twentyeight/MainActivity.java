@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
         ////////////////////////
         ///   init TempChart ///
         ////////////////////////
-       temperatureChart.refreshTempCharts();
+       temperatureChart.refreshTempCharts(true);
 
 
 
@@ -188,7 +188,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void selectIsReady(boolean result) { // aktuelle Temp geladen
-                temperatureChart.refreshTempCharts();
+                temperatureChart.refreshTempCharts(false);
                 LineChart chart = (LineChart) findViewById(R.id.chart);
                 chart.invalidate();
 
