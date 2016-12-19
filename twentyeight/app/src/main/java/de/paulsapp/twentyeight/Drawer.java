@@ -334,7 +334,7 @@ public class Drawer{
     }
 
     public void updateDosenStatus() {
-        if (server!=null&&server.isInitialized==true) {
+        if (server!=null&&server.isInitialized) {
             updateDose();
         }
 

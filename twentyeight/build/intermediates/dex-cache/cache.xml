@@ -3,93 +3,93 @@
 
     <item
         is-multidex="true"
-        jar="D:\Workspace\twentyeight\twentyeight\app\libs\volley.jar"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\libs\volley.jar"
         jumboMode="true"
         optimize="true"
         revision="23.0.2"
         sha1="d4aaa36e04ee71a83444f8367c97a46fda662d2c">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\2\volley_7dc384613453a49c94f69d7b2cbbcac83a458b46\classes.dex" />
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\2\volley_a73115cd9ef373ec7756e6ec109b1ceda1de66c9\classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="33aab2add92c02b45e9ec59c2a418b292589e93d">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_9df5f2a5054d7d01f858e76dac010413d7448258\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\21.0.3\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="4b8945fc23a7461c6fdde15753456d64b0a9358b">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-21.0.3_e9faf9a337dc959dd34a9c4f24fd637e899e7c6b\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\pauls\.gradle\caches\modules-2\files-2.1\com.github.PhilJay\MPAndroidChart\v3.0.1\369f9aa48a629b4e92557b37326f42dc3de796e4\MPAndroidChart-v3.0.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="369f9aa48a629b4e92557b37326f42dc3de796e4">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\MPAndroidChart-v3.0.1_3a4f7a6616cdde7d569625772fb3632a35e43ee6\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.1\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="4486e953d1f35f8ccab098b1dd67146366d5f731">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-22.2.1_964535acbc130700f68522fe45a2e607b2a34540\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="9195aa453ec533f84dd0a822a7cd418c6b851f87">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_49b9a45713ca3012f99708dd3908e080c72e43db\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.1\jars\libs\internal_impl-22.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-22.2.1_99bd861f5ef43e1c7b4f7eae4331e5d84594a1be\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\1.2.1\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="4b868b833b0887aa48c4e581558eef4f1196f6a2">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\de.hdodenhof-circleimageview-1.2.1_b7a21ab3b3755e3925e17742cab46a0304773322\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.1\jars\classes.jar"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="23.0.2"
         sha1="f8efd0096475e0daf054267b61544e10dc776503">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-22.2.1_0879dc5cf8f0eb2cd41746a0988690fb033f0b97\classes.dex" />
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-22.2.1_79e18ca526f361ed8424d3493dc45a0544e09e91\classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="D:\Android_SDK\extras\android\m2repository\com\android\support\support-annotations\22.2.1\support-annotations-22.2.1.jar"
+        jar="C:\Users\pstiegele\.gradle\caches\modules-2\files-2.1\com.github.PhilJay\MPAndroidChart\v3.0.1\369f9aa48a629b4e92557b37326f42dc3de796e4\MPAndroidChart-v3.0.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="369f9aa48a629b4e92557b37326f42dc3de796e4">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\MPAndroidChart-v3.0.1_dd5fcf7cc758417261632c246413da742c445d0b\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\21.0.3\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="4b8945fc23a7461c6fdde15753456d64b0a9358b">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-21.0.3_e88fc0edc6a854253ee1e1fe0300175442a2f5fb\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\pstiegele\android-sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.1\support-annotations-22.2.1.jar"
         jumboMode="true"
         optimize="true"
         revision="23.0.2"
         sha1="61a0ff5c29295ec56d7e0bd3d25d95dbf71b4b2b">
-        <dex dex="D:\Workspace\twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-22.2.1_ad2585b2d0daf372e84236315cbb12db0d207d02\classes.dex" />
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-22.2.1_9a4a408b6e76f61b7d19ce9d7247dd2056ebef6d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="1326aed7db19f7b9a1107b1def84f166a3981537">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_dda29a895648a9979245be2f4857ed8d9c5eb3ba\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.1\jars\libs\internal_impl-22.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-22.2.1_4d4bc29ee6ce5be73414ba2e606f2f34e55add54\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\1.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="4b868b833b0887aa48c4e581558eef4f1196f6a2">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\de.hdodenhof-circleimageview-1.2.1_eb010bf9ccde3170e22e68dae9bdac3127d6c7f8\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="94fe6befdec5a9e79720cc5dd50ca774603f742f">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_ef54e06b3ccdbec6d22a6089dd4bfc7d99c298bd\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="4486e953d1f35f8ccab098b1dd67146366d5f731">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-22.2.1_5ba2350d4e88fd2450cdb70b19f4e5be2a8641e5\classes.dex" />
     </item>
 
 </items>

@@ -1,7 +1,7 @@
-#Fri Dec 16 13:19:01 CET 2016
-base.0=D\:\\Workspace\\twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_9df5f2a5054d7d01f858e76dac010413d7448258
+#Mon Dec 19 11:22:26 CET 2016
+base.0=D\:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_ef54e06b3ccdbec6d22a6089dd4bfc7d99c298bd
 renamed.1=classes2.dex
 renamed.0=classes.dex
-file.1=D\:\\Workspace\\twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_49b9a45713ca3012f99708dd3908e080c72e43db\\classes.dex
-base.1=D\:\\Workspace\\twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_49b9a45713ca3012f99708dd3908e080c72e43db
-file.0=D\:\\Workspace\\twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_9df5f2a5054d7d01f858e76dac010413d7448258\\classes.dex
+file.1=D\:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_dda29a895648a9979245be2f4857ed8d9c5eb3ba\\classes.dex
+base.1=D\:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_dda29a895648a9979245be2f4857ed8d9c5eb3ba
+file.0=D\:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_ef54e06b3ccdbec6d22a6089dd4bfc7d99c298bd\\classes.dex

@@ -444,11 +444,13 @@ public class Server {
 						.getColumnIndex("password"));
 				this.context=context;
 				crs.close();
+				isInitialized=true;
 				return true;
 			} catch (Exception e) {
 				Log.e("Server","could not load credentials");
 			}
 			crs.close();
+
 			return false;
 
 		}
