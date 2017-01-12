@@ -188,9 +188,12 @@ public class MainActivity extends Activity {
 
             @Override
             public void selectIsReady(boolean result) { // aktuelle Temp geladen
-                temperatureChart.refreshTempCharts(false);
-                LineChart chart = (LineChart) findViewById(R.id.chart);
-                chart.invalidate();
+                if(temperatureChart!=null){
+                    temperatureChart.refreshTempCharts(false);
+                    LineChart chart = (LineChart) findViewById(R.id.chart);
+                    chart.invalidate();
+                }
+
 
             }
         });
@@ -228,9 +231,11 @@ public class MainActivity extends Activity {
 
 
     public void updateguibarcharts() { // aktuelle Temperatur
+if(temperature!=null){
+    temperature.refreshtemp();
+    temperatureChart.updateTempCharts();
+}
 
-        temperature.refreshtemp();
-        temperatureChart.updateTempCharts();
     }
 
     @Override

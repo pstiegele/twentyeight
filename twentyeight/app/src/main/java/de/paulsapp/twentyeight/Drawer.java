@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.SeekBar;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -41,6 +42,7 @@ public class Drawer{
     public RecyclerView.Adapter mDrawerAdapter;
     public ActionBarDrawerToggle mDrawerToggle;
     public boolean[] mStatus;
+    public int[] mValue;
     private Database db;
     private Activity activity;
     public Drawer(Context context, Database db, Server server, Activity activity){
@@ -52,12 +54,14 @@ public class Drawer{
 
 
     public void loadDrawerTitleAndStatus() {
-        Cursor cr = db.getRawQuery("SELECT name,status FROM doseElements");
+        Cursor cr = db.getRawQuery("SELECT name,status,value FROM doseElements");
         mDrawerItemsTitles = new String[cr.getCount()];
         mStatus = new boolean[cr.getCount()];
+        mValue = new int[cr.getCount()];
         for (int i = 0; i < cr.getCount(); i++) {
             mDrawerItemsTitles[i] = cr.getString(cr.getColumnIndex("name"));
             mStatus[i] = cr.getInt(cr.getColumnIndex("status")) == 0;
+            mValue[i] = cr.getInt(cr.getColumnIndex("value"));
             cr.moveToNext();
         }
         cr.close();
@@ -76,7 +80,7 @@ public class Drawer{
         mDrawerRecyclerView = (RecyclerView) activity.findViewById(R.id.left_drawer);
 
         mDrawerRecyclerView.setHasFixedSize(true);
-        mDrawerAdapter = new MyDrawerAdapter(mDrawerItemsTitles, mDrawerItemsIcons, mStatus, NAME, EMAIL, PROFILEPICTURE, context);
+        mDrawerAdapter = new MyDrawerAdapter(mDrawerItemsTitles, mDrawerItemsIcons, mStatus, mValue, NAME, EMAIL, PROFILEPICTURE, context, server,db);
         mDrawerRecyclerView.setAdapter(mDrawerAdapter);
         mDrawerLayoutManager = new LinearLayoutManager(activity);
         mDrawerRecyclerView.setLayoutManager(mDrawerLayoutManager);
@@ -106,6 +110,8 @@ public class Drawer{
             }
 
         });
+
+
 
         mDrawerRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
@@ -141,6 +147,7 @@ public class Drawer{
             public void onTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
             }
         });
+
 
     }
     private void selectItem(int position) {
@@ -266,6 +273,8 @@ public class Drawer{
                         //   int shortTimeLimit;
                         //   Date timeSetShort = null;
                         //  Date lastTimeSet = null;
+                        int value;
+
 
                         if(count!=mStatus.length){
                             mStatus=new boolean[count];
@@ -280,22 +289,32 @@ public class Drawer{
                             } else {
                                 status = DoseStatus.AN;
                             }
+                            if(job.isNull("value")){
+                                value=-1;
+                            }else{
+                                value=job.getInt("value");
+                            }
 
 
-                            String sqlstring = "INSERT INTO doseElements (name,status) VALUES ('"
+
+                            String sqlstring = "INSERT INTO doseElements (name,status,value) VALUES ('"
                                     + name
                                     + "','"
                                     + status.getAsInt()
-                                    + "')";
+                                    + "','"
+                                    +value
+                                    +"')";
                             Cursor cr = db.getRawQuery("SELECT name FROM doseElements WHERE name = '" + name + "'");
                             if (cr.getCount() == 0) {
                                 db.execSQLString(sqlstring);
                             } else {
                                 db.execSQLString("UPDATE \"doseElements\" SET \"status\"='" + status.getAsInt() + "' WHERE \"name\" = '" + name + "'");
+                                db.execSQLString("UPDATE \"doseElements\" SET \"value\"='" + value + "' WHERE \"name\" = '" + name + "'");
                             }
                             cr.close();
                             if (mStatus.length >= i) {
                                 mStatus[i] = status.getAsBoolean();
+                                mValue[i] = value;
                                 statusChanges = true;
                             }
 

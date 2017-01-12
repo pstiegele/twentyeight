@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
     android:background="#ffffff"
@@ -40,4 +41,15 @@
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="16dp"/>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:max="100"
+        android:progress="50"
+        android:layout_alignBottom="@id/drawerItemTitle"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/drawerSeekBar"
+        android:scrollbarSize="20dp" />
 </RelativeLayout>

@@ -53,7 +53,9 @@
         icon  TEXT,
         shortTimeLimit int,
         timeSetShort DATETIME,
-        lastTimeSet DATETIME
+        lastTimeSet DATETIME,
+            value int
+
       )
 </item>
 

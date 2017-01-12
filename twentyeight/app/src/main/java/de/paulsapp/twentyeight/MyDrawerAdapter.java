@@ -1,14 +1,28 @@
 package de.paulsapp.twentyeight;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 /**
  * Created by pstiegele on 15.12.2015.
@@ -21,23 +35,29 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
     private String mNavTitles[]; // String Array to store the passed titles Value from MainActivity.java
     private int mIcons[];       // Int Array to store the passed icons resource value from MainActivity.java
     private boolean mSwitch[]; //Status of the item
+    private int mValue[];
     private String name;        //String Resource for header View Name
     private int profile;        //int Resource for header view profile picture
     private String email;       //String Resource for header view email
+    private Server server;
+    private Database db;
 
 
     // Creating a ViewHolder which extends the RecyclerView View Holder
     // ViewHolder are used to to store the inflated views in order to recycle them
 
-    MyDrawerAdapter(String Titles[], int Icons[], boolean[] Switch,String Name, String Email, int Profile, Context passedContext) { // MyAdapter Constructor with titles and icons parameter
+    MyDrawerAdapter(String Titles[], int Icons[], boolean[] Switch, int[] Value, String Name, String Email, int Profile, Context passedContext, Server server, Database db) { // MyAdapter Constructor with titles and icons parameter
         // titles, icons, name, email, profile pic are passed from the main activity as we
         mNavTitles = Titles;                //have seen earlier
         mIcons = Icons;
         mSwitch = Switch;
+        mValue = Value;
         name = Name;
         email = Email;
         profile = Profile;                     //here we assign those passed values to the values we declared here
         this.context = passedContext;
+        this.server = server;
+        this.db = db;
         //in adapter
 
 
@@ -79,12 +99,106 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
     // Tells us item at which position is being constructed to be displayed and the holder id of the holder object tell us
     // which view type is being created 1 for item row
     @Override
-    public void onBindViewHolder(MyDrawerAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(MyDrawerAdapter.ViewHolder holder, final int position) {
         if (holder.Holderid == 1) {                              // as the list view is going to be called after the header view so we decrement the
             // position by 1 and pass it to the holder while setting the text and image
             holder.textView.setText(mNavTitles[position - 1]); // Setting the Text with the array of our Titles
             holder.imageView.setImageResource(mIcons[position - 1]);// Settimg the image with array of our icons
-            holder.switcher.setChecked(mSwitch[position-1]);
+            holder.switcher.setChecked(mSwitch[position - 1]);
+            if (mValue[position - 1] != -1) {
+                holder.seekBar.setVisibility(View.VISIBLE);
+                holder.seekBar.setProgress(mValue[position - 1]);
+                holder.seekBar.setOnTouchListener(new ListView.OnTouchListener(){
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event){
+                        int action = event.getAction();
+                        switch(action){
+                            case MotionEvent.ACTION_DOWN:
+                                v.getParent().requestDisallowInterceptTouchEvent(true);
+                                break;
+
+                            case MotionEvent.ACTION_UP:
+                                v.getParent().requestDisallowInterceptTouchEvent(false);
+                                break;
+                        }
+                        v.onTouchEvent(event);
+                        return true;
+                    }
+                });
+                holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        Log.d("Seekbar", "ProgressChanged erkannt");
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        Log.d("Seekbar", "Start erkannt");
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        Log.d("Seekbar", "Ende erkannt");
+
+                        AsyncSetValueRunner runner = new AsyncSetValueRunner();
+
+                        Dosen.SammelParamsStatic sp = new Dosen.SammelParamsStatic(String.valueOf(position), String.valueOf(seekBar.getProgress()), server);
+                        runner.execute(sp);
+                        db.execSQLString("UPDATE \"doseElements\" SET \"value\"='" + seekBar.getProgress() + "' WHERE \"id\" = " + position);
+                        mValue[position-1]=seekBar.getProgress();
+                    }
+
+                    class AsyncSetValueRunner extends AsyncTask<Dosen.SammelParamsStatic, String, Boolean> {
+                        @Override
+                        protected Boolean doInBackground(Dosen.SammelParamsStatic... params) {
+
+                            String id = params[0].name;
+                            String value = params[0].status;
+                            Server server = params[0].server;
+                            // Create a new HttpClient and Post Header
+                            HttpClient httpclient = new DefaultHttpClient();
+                            HttpPost httppost = new HttpPost(server.address);
+                            JSONObject json = new JSONObject();
+
+                            try {
+                                // JSON data:
+                                json.put("type", "doseSetValue");
+                                json.put("user", server.user);
+                                json.put("password", server.password);
+                                json.put("doseId", id);
+                                json.put("doseValue", value);
+
+                                JSONArray postjson = new JSONArray();
+                                postjson.put(json);
+
+                                // Post the data:
+                                httppost.setHeader("json", json.toString());
+                                httppost.getParams().setParameter("jsonpost", postjson);
+
+                                // Execute HTTP Post Request
+
+                                httpclient.execute(httppost);
+
+
+                            } catch (IOException e) {
+                                Log.i("paul", e.getLocalizedMessage());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            return true;
+                        }
+
+
+                        protected void onPreExecute() {
+                            // Things to be done before execution of long running operation. For
+                            // example showing ProgessDialog
+                        }
+                    }
+
+
+                });
+            }
+
 
         } else {
 
@@ -122,6 +236,7 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
         ImageView profile;
         TextView Name;
         TextView email;
+        SeekBar seekBar;
         Context contxt;
 
         public ViewHolder(View itemView, int ViewType, Context c) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
@@ -134,6 +249,7 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
                 textView = (TextView) itemView.findViewById(R.id.drawerItemTitle); // Creating TextView object with the id of textView from item_row.xml
                 imageView = (ImageView) itemView.findViewById(R.id.rowIcon);// Creating ImageView object with the id of ImageView from item_row.xml
                 switcher = (Switch) itemView.findViewById(R.id.drawer_switch_item); // Switch
+                seekBar = (SeekBar) itemView.findViewById(R.id.drawerSeekBar);
                 Holderid = 1;                                               // setting holder id as 1 as the object being populated are of type item row
             } else {
 
@@ -144,6 +260,7 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
                 Holderid = 0;                                                // Setting holder id = 0 as the object being populated are of type header view
             }
         }
+
 
     }
 }
