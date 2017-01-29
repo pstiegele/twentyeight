@@ -68,12 +68,12 @@
         "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\22.2.1\\res\\drawable-mdpi\\abc_textfield_activated_mtrl_alpha.9.png"
     },
     {
-        "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi\\wasserkocher.png",
-        "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-mdpi\\wasserkocher.png"
-    },
-    {
         "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi\\abc_btn_switch_to_on_mtrl_00012.9.png",
         "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\22.2.1\\res\\drawable-mdpi\\abc_btn_switch_to_on_mtrl_00012.9.png"
+    },
+    {
+        "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi\\wasserkocher.png",
+        "source": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\src\\main\\res\\drawable-mdpi\\wasserkocher.png"
     },
     {
         "merged": "D:\\pstiegele\\Documents\\git\\Twentyeight\\twentyeight\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi\\abc_list_longpressed_holo.9.png",

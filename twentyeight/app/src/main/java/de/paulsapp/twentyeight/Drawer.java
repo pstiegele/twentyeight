@@ -314,7 +314,10 @@ public class Drawer{
                             cr.close();
                             if (mStatus.length >= i) {
                                 mStatus[i] = status.getAsBoolean();
-                                mValue[i] = value;
+                                if(mValue.length-1>=i){
+                                    mValue[i] = value;
+                                }
+
                                 statusChanges = true;
                             }
 

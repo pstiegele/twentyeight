@@ -5,29 +5,29 @@
     density="xxxhdpi"
     format="8"
     plugin-version="2.2.3"
-    timestamp="136356998403456"
+    timestamp="611873303220353"
     token="-6785846879691722263"
     verifier="FULL_BUILD_REQUESTED" >
 
     <task
         name="javac"
-        duration="1333" />
+        duration="0" />
     <task
         name="instant-run-dex"
         duration="0" />
     <task
         name="instant-run-transform"
-        duration="103" />
+        duration="0" />
     <task
         name="verifier"
-        duration="23" />
+        duration="0" />
 
     <artifact
         location="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\outputs\apk\app-debug.apk"
         type="MAIN" />
 
     <build
-        timestamp="136356998403456"
+        timestamp="611873303220353"
         verifier="FULL_BUILD_REQUESTED" >
         <artifact
             location="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\outputs\apk\app-debug.apk"

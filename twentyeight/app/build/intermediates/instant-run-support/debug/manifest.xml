@@ -30,6 +30,7 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -55,7 +56,17 @@
         <service
             android:name="de.paulsapp.twentyeight.WidgetService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="" />
+
+        <uses-library
+            android:name="com.sec.android.app.multiwindow"
+            android:required="false" >
+        </uses-library>
+
+        <meta-data
+            android:name="com.sec.android.support.multiwindow"
+            android:value="true" />
 
         <activity
             android:name="android.support.v7.widget.TestActivity"
