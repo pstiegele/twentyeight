@@ -21,24 +21,6 @@
     </item>
     <item
         is-multidex="true"
-        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.1\jars\libs\internal_impl-22.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
-        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-22.2.1_4d4bc29ee6ce5be73414ba2e606f2f34e55add54\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\1.2.1\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="4b868b833b0887aa48c4e581558eef4f1196f6a2">
-        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\de.hdodenhof-circleimageview-1.2.1_eb010bf9ccde3170e22e68dae9bdac3127d6c7f8\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\pstiegele\.gradle\caches\modules-2\files-2.1\com.github.PhilJay\MPAndroidChart\v3.0.1\369f9aa48a629b4e92557b37326f42dc3de796e4\MPAndroidChart-v3.0.1.jar"
         jumboMode="true"
         optimize="true"
@@ -66,21 +48,39 @@
     </item>
     <item
         is-multidex="true"
-        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="23.0.2"
-        sha1="d09ded36f9e99625d11e50ef74a9f6b54697e6e4">
-        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_ef54e06b3ccdbec6d22a6089dd4bfc7d99c298bd\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"
         revision="23.0.2"
-        sha1="08d15d57aacea118e4342e6c4a0888160f00a613">
+        sha1="8c1b5246cebb1ff6cc4b451016dbf5734a275a2f">
         <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_dda29a895648a9979245be2f4857ed8d9c5eb3ba\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.1\jars\libs\internal_impl-22.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-22.2.1_4d4bc29ee6ce5be73414ba2e606f2f34e55add54\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\1.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="4b868b833b0887aa48c4e581558eef4f1196f6a2">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\de.hdodenhof-circleimageview-1.2.1_eb010bf9ccde3170e22e68dae9bdac3127d6c7f8\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="23.0.2"
+        sha1="fa5324c0dc33460de8b586c554ab5e26b565a3ec">
+        <dex dex="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_ef54e06b3ccdbec6d22a6089dd4bfc7d99c298bd\classes.dex" />
     </item>
     <item
         is-multidex="true"
