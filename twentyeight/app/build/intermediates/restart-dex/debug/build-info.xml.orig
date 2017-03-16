@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<instant-run
+    abi="arm64-v8a,armeabi-v7a,armeabi"
+    api-level="23"
+    density="xxxhdpi"
+    format="8"
+    plugin-version="2.2.3"
+<<<<<<< HEAD
+    timestamp="847031426573974"
+=======
+    timestamp="589301910372579"
+>>>>>>> 584244d588dd4acfead25bd6435a9910d7245cdd
+    token="-6785846879691722263"
+    verifier="FULL_BUILD_REQUESTED" >
+
+    <task
+        name="javac"
+<<<<<<< HEAD
+        duration="1320" />
+=======
+        duration="5651" />
+>>>>>>> 584244d588dd4acfead25bd6435a9910d7245cdd
+    <task
+        name="instant-run-dex"
+        duration="0" />
+    <task
+        name="instant-run-transform"
+<<<<<<< HEAD
+        duration="49" />
+    <task
+        name="verifier"
+        duration="68" />
+=======
+        duration="3296" />
+    <task
+        name="verifier"
+        duration="1065" />
+>>>>>>> 584244d588dd4acfead25bd6435a9910d7245cdd
+
+    <artifact
+        location="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\outputs\apk\app-debug.apk"
+        type="MAIN" />
+
+    <build
+<<<<<<< HEAD
+        timestamp="847031426573974"
+=======
+        timestamp="589301910372579"
+>>>>>>> 584244d588dd4acfead25bd6435a9910d7245cdd
+        verifier="FULL_BUILD_REQUESTED" >
+        <artifact
+            location="D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\build\outputs\apk\app-debug.apk"
+            type="MAIN" />
+    </build>
+
+</instant-run>
