@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="mint-android-sdk-5.2.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/mint-plugin-repo-5.2.1/com/splunk/mint-android-sdk/5.2.1/mint-android-sdk-5.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

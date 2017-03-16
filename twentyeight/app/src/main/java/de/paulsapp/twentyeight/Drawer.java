@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.SeekBar;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -32,22 +31,23 @@ import java.io.InputStreamReader;
  * Created by Paul Stiegele on 12.12.2016. Hell yeah!
  */
 
-public class Drawer{
+public class Drawer {
+    public RecyclerView.Adapter mDrawerAdapter;
+    public ActionBarDrawerToggle mDrawerToggle;
+    public boolean[] mStatus;
+    public int[] mValue;
     private Server server;
     private Context context;
     private String[] mDrawerItemsTitles;
     private int[] mDrawerItemsIcons = {R.drawable.schreibtischlampe, R.drawable.fernseher, R.drawable.bluetoothspeaker, R.drawable.lightstripe};
     private DrawerLayout mDrawerLayout;
     private RecyclerView mDrawerRecyclerView;
-    public RecyclerView.Adapter mDrawerAdapter;
-    public ActionBarDrawerToggle mDrawerToggle;
-    public boolean[] mStatus;
-    public int[] mValue;
     private Database db;
     private Activity activity;
-    public Drawer(Context context, Database db, Server server, Activity activity){
-        this.context=context;
-        this.db =db;
+
+    public Drawer(Context context, Database db, Server server, Activity activity) {
+        this.context = context;
+        this.db = db;
         this.server = server;
         this.activity = activity;
     }
@@ -80,7 +80,7 @@ public class Drawer{
         mDrawerRecyclerView = (RecyclerView) activity.findViewById(R.id.left_drawer);
 
         mDrawerRecyclerView.setHasFixedSize(true);
-        mDrawerAdapter = new MyDrawerAdapter(mDrawerItemsTitles, mDrawerItemsIcons, mStatus, mValue, NAME, EMAIL, PROFILEPICTURE, context, server,db);
+        mDrawerAdapter = new MyDrawerAdapter(mDrawerItemsTitles, mDrawerItemsIcons, mStatus, mValue, NAME, EMAIL, PROFILEPICTURE, context, server, db);
         mDrawerRecyclerView.setAdapter(mDrawerAdapter);
         mDrawerLayoutManager = new LinearLayoutManager(activity);
         mDrawerRecyclerView.setLayoutManager(mDrawerLayoutManager);
@@ -112,7 +112,6 @@ public class Drawer{
         });
 
 
-
         mDrawerRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
             public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
@@ -121,23 +120,26 @@ public class Drawer{
 
                 if (child != null && mGestureDetector.onTouchEvent(motionEvent)) {
                     // mDrawerLayout.closeDrawers();
-                    //Toast.makeText(MainActivity.this, "The Item Clicked is: " + recyclerView.getChildPosition(child), Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(MainActivity.this, "The Item Clicked is: " + recyclerView.getChildPosition(child), Toast.LENGTH_SHORT).show();
 
                     mDrawerAdapter.notifyDataSetChanged();
-
+                    int a = recyclerView.getChildAdapterPosition(child);
+                    int b = recyclerView.getChildLayoutPosition(child);
+                    int c = recyclerView.getChildCount();
+                    View d = recyclerView.getChildAt(0);
                     AsyncSetStatusRunner runner = new AsyncSetStatusRunner();
                     int newStatus;
-                    if (mStatus[recyclerView.getChildPosition(child) - 1]) {
+                    if (mStatus[recyclerView.getChildLayoutPosition(child) - 1]) {
                         newStatus = 0;    //invertiert, weil Status ja geändert werden soll
-                        mStatus[recyclerView.getChildPosition(child) - 1] = false;
+                        mStatus[recyclerView.getChildLayoutPosition(child) - 1] = false;
                     } else {
                         newStatus = 1;
-                        mStatus[recyclerView.getChildPosition(child) - 1] = true;
+                        mStatus[recyclerView.getChildLayoutPosition(child) - 1] = true;
                     }
-                    Dosen.SammelParamsStatic sp = new Dosen.SammelParamsStatic(mDrawerItemsTitles[recyclerView.getChildPosition(child) - 1], String.valueOf(newStatus), server);
+                    Dosen.SammelParamsStatic sp = new Dosen.SammelParamsStatic(mDrawerItemsTitles[recyclerView.getChildLayoutPosition(child) - 1], String.valueOf(newStatus), server);
                     mDrawerAdapter.notifyDataSetChanged();
                     runner.execute(sp);
-                    db.execSQLString("UPDATE \"doseElements\" SET \"status\"='" + newStatus + "' WHERE \"id\" = " + recyclerView.getChildPosition(child));
+                    db.execSQLString("UPDATE \"doseElements\" SET \"status\"='" + newStatus + "' WHERE \"id\" = " + recyclerView.getChildLayoutPosition(child));
                     return true;
                 }
                 return false;
@@ -150,16 +152,30 @@ public class Drawer{
 
 
     }
+
     private void selectItem(int position) {
         // update the main content by replacing fragments
         //hier den code einfügen um status eines geräts zu verändern
         if (position == 4122) {
-           Log.d("Drawer","krass, selectItem wurde aufgerufen");
+            Log.d("Drawer", "krass, selectItem wurde aufgerufen");
         }
         // update selected item and title, then close the drawer
         //  mDrawerRecyclerView.setItemChecked(position, true);
         // setTitle(mPlanetTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerRecyclerView);
+    }
+
+    private void updateDose() {
+        AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
+        Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
+        runner.execute(sps);
+    }
+
+    public void updateDosenStatus() {
+        if (server != null && server.isInitialized) {
+            updateDose();
+        }
+
     }
 
     private class AsyncSetStatusRunner extends AsyncTask<Dosen.SammelParamsStatic, String, Boolean> {
@@ -276,8 +292,8 @@ public class Drawer{
                         int value;
 
 
-                        if(count!=mStatus.length){
-                            mStatus=new boolean[count];
+                        if (count != mStatus.length) {
+                            mStatus = new boolean[count];
                         }
 
                         for (int i = 0; i < count; i++) {
@@ -289,12 +305,11 @@ public class Drawer{
                             } else {
                                 status = DoseStatus.AN;
                             }
-                            if(job.isNull("value")){
-                                value=-1;
-                            }else{
-                                value=job.getInt("value");
+                            if (job.isNull("value")) {
+                                value = -1;
+                            } else {
+                                value = job.getInt("value");
                             }
-
 
 
                             String sqlstring = "INSERT INTO doseElements (name,status,value) VALUES ('"
@@ -302,8 +317,8 @@ public class Drawer{
                                     + "','"
                                     + status.getAsInt()
                                     + "','"
-                                    +value
-                                    +"')";
+                                    + value
+                                    + "')";
                             Cursor cr = db.getRawQuery("SELECT name FROM doseElements WHERE name = '" + name + "'");
                             if (cr.getCount() == 0) {
                                 db.execSQLString(sqlstring);
@@ -314,7 +329,7 @@ public class Drawer{
                             cr.close();
                             if (mStatus.length >= i) {
                                 mStatus[i] = status.getAsBoolean();
-                                if(mValue.length-1>=i){
+                                if (mValue.length - 1 >= i) {
                                     mValue[i] = value;
                                 }
 
@@ -323,7 +338,6 @@ public class Drawer{
 
 
                         }
-
 
 
                     }
@@ -347,19 +361,6 @@ public class Drawer{
             // Things to be done before execution of long running operation. For
             // example showing ProgessDialog
         }
-    }
-
-    private void updateDose(){
-        AsyncGetElementsRunner runner = new AsyncGetElementsRunner();
-        Dosen.SammelParamsStatic sps = new Dosen.SammelParamsStatic(server);
-        runner.execute(sps);
-    }
-
-    public void updateDosenStatus() {
-        if (server!=null&&server.isInitialized) {
-            updateDose();
-        }
-
     }
 
 }

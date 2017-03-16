@@ -211,6 +211,9 @@ public class MyDrawerAdapter extends RecyclerView.Adapter<MyDrawerAdapter.ViewHo
     // This method returns the number of items present in the list
     @Override
     public int getItemCount() {
+        if(mNavTitles==null){
+            return 0;
+        }
         return mNavTitles.length + 1; // the number of items in the list will be +1 the titles including the header view.
     }
 

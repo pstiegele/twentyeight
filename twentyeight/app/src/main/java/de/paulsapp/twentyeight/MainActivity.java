@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.splunk.mint.Mint;
 
 import java.util.GregorianCalendar;
 import java.util.Timer;
@@ -47,6 +48,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Mint.setApplicationEnvironment(Mint.appEnvironmentStaging);
+        Mint.initAndStartSession(this.getApplication(), "55f2ef32");
         setContentView(R.layout.layout_root);
         context = getApplicationContext();
         init(savedInstanceState);
