@@ -6,11 +6,11 @@ ADDED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\Andro
 		INJECTED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml
 		INJECTED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml
 	android:versionName
-		ADDED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml:5:5-30
+		ADDED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml:5:5-31
 		INJECTED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml
 		INJECTED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml
 	android:versionCode
-		ADDED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml:4:5-28
+		ADDED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml:4:5-29
 		INJECTED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml
 		INJECTED from D:\pstiegele\Documents\git\Twentyeight\twentyeight\app\src\main\AndroidManifest.xml
 	xmlns:android

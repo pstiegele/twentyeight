@@ -192,9 +192,14 @@ public class MainActivity extends Activity {
             @Override
             public void selectIsReady(boolean result) { // aktuelle Temp geladen
                 if(temperatureChart!=null){
-                    temperatureChart.refreshTempCharts(false);
-                    LineChart chart = (LineChart) findViewById(R.id.chart);
-                    chart.invalidate();
+                    try {
+                        temperatureChart.refreshTempCharts(false);
+                        LineChart chart = (LineChart) findViewById(R.id.chart);
+                        chart.invalidate();
+                    }catch (Exception e){
+
+                    }
+
                 }
 
 

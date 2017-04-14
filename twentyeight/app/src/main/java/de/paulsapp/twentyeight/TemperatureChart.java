@@ -50,13 +50,13 @@ public class TemperatureChart {
     private Temperature temperature;
     private Database db;
     private Activity activity;
-    private Server server;
     final Runnable Runnable_Chart = new Runnable() {
         public void run() {
             final LineChart chart = (LineChart) activity.findViewById(R.id.chart);
             chart.invalidate();
         }
     };
+    private Server server;
     private boolean isInitalized = false;
     private Handler handler = new Handler();
 
@@ -68,21 +68,24 @@ public class TemperatureChart {
     }
 
     public void refreshTempCharts(boolean animate) {
-        if (!isInitalized) {
-            initalizeTempChart();
-        }
-        if(server.nodata()){
-            return;
-        }
-        Object[] aussen = importTempChartAussen(); //in aussen[0] ist das LineDataSet gespeichert, in aussen[1] die xValues
-        LineDataSet innen = importTemperatureInnen();
-        setLineDatasInChart((LineDataSet)aussen[0],innen,(ArrayList<String>) aussen[1]);
-        LineChart chart = (LineChart) activity.findViewById(R.id.chart);
-        if(animate){
-            chart.animateY(1500);
-        }
+        try {
+            if (!isInitalized) {
+                initalizeTempChart();
+            }
+            if (server.nodata()) {
+                return;
+            }
+            Object[] aussen = importTempChartAussen(); //in aussen[0] ist das LineDataSet gespeichert, in aussen[1] die xValues
+            LineDataSet innen = importTemperatureInnen();
+            setLineDatasInChart((LineDataSet) aussen[0], innen, (ArrayList<String>) aussen[1]);
+            LineChart chart = (LineChart) activity.findViewById(R.id.chart);
+            if (animate) {
+                chart.animateY(1500);
+            }
 
+        } catch (Exception e) {
 
+        }
     }
 
     private Object[] importTempChartAussen() {
@@ -145,7 +148,7 @@ public class TemperatureChart {
                         GregorianCalendar.SHORT, Locale.GERMANY);
             }
             xValues.add(day_of_week);
-            values.add(new Entry(i,cr1.getFloat(cr1.getColumnIndex("value"))));
+            values.add(new Entry(i, cr1.getFloat(cr1.getColumnIndex("value"))));
             cr1.moveToNext();
         }
         cr1.close();
@@ -165,8 +168,8 @@ public class TemperatureChart {
         set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
         Object[] result = new Object[2];
-        result[0]=set1;
-        result[1]=xValues;
+        result[0] = set1;
+        result[1] = xValues;
         return result;
     }
 
@@ -182,7 +185,7 @@ public class TemperatureChart {
                 + "' GROUP BY SUBSTR(datetime,0,11) ORDER BY datetime";
         Cursor cr = db.getRawQuery(query2);
         for (int i = 0; i < cr.getCount(); i++) {
-            values.add(new Entry(i,cr.getFloat(cr.getColumnIndex("value"))));
+            values.add(new Entry(i, cr.getFloat(cr.getColumnIndex("value"))));
             cr.moveToNext();
         }
         cr.close();
@@ -252,7 +255,7 @@ public class TemperatureChart {
 
         Legend legend = chart.getLegend();
         legend.setEnabled(false);
-        isInitalized=true;
+        isInitalized = true;
     }
 
 
@@ -272,7 +275,7 @@ public class TemperatureChart {
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                return xValues.get((int)value);
+                return xValues.get((int) value);
             }
         };
 
@@ -291,7 +294,7 @@ public class TemperatureChart {
     }
 
     public void updateTempCharts() {
-        if(server.nodata()){
+        if (server.nodata()) {
             return;
         }
         final TextView tv_aussen = (TextView) activity.findViewById(R.id.temperature_now_outside);
